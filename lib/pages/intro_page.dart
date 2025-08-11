@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 
-class IntroPage extends StatelessWidget {
+class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
 
   @override
+  State<IntroPage> createState() => _IntroPageState();
+}
+
+class _IntroPageState extends State<IntroPage> {
+  bool hidden = true;
+
+  @override
   Widget build(BuildContext context) {
+    var hiddenIcon = Icon(Icons.visibility);
+    var hiddenOff = Icon(Icons.visibility_off);
+    var icon = hidden ? hiddenOff : hiddenIcon;
+
     return Scaffold(
       appBar: AppBar(title: Text("this is hte app var")),
       body: Column(
@@ -31,13 +42,22 @@ class IntroPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: TextField(
-                  obscureText: true,
+                  obscureText: hidden,
 
                   decoration: InputDecoration(
                     labelText: "this is the label text 2",
                     contentPadding: EdgeInsets.all(15),
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
+
+                    suffixIcon: IconButton(
+                      icon: icon,
+                      onPressed: () {
+                        setState(() {
+                          hidden = !hidden;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -54,7 +74,5 @@ class IntroPage extends StatelessWidget {
     );
   }
 
-  void buttonPressed() {
-    print("button is pressed");
-  }
+  void buttonPressed() {}
 }
