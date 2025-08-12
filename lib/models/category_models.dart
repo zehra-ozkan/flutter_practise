@@ -18,7 +18,7 @@ class CategoryModel {
       CategoryModel(
         name: "pancake",
         iconPath: "assets/images/pancake.jpg",
-        boxColor: Color.fromARGB(255, 133, 133, 200),
+        boxColor: Color.fromARGB(255, 227, 162, 77),
       ),
     );
 
@@ -26,7 +26,7 @@ class CategoryModel {
       CategoryModel(
         name: "pie",
         iconPath: "assets/images/pie.jpg",
-        boxColor: Color.fromARGB(255, 200, 175, 133),
+        boxColor: Color.fromARGB(255, 146, 82, 73),
       ),
     );
 
