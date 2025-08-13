@@ -24,7 +24,7 @@ class _IntroPageState extends State<IntroPage> {
     var icon = hidden ? hiddenOff : hiddenIcon;
 
     return Scaffold(
-      appBar: AppBar(title: Text("this is hte app var")),
+      appBar: AppBar(title: Text("this is the app var")),
       body: loginField(icon, context),
     );
   }
