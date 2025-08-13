@@ -4,41 +4,38 @@ import 'package:http/http.dart' as http; // The 'as http' part is crucial
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
-
+  //bool hidden = true;
   @override
   State<IntroPage> createState() => _IntroPageState();
 }
 
 class _IntroPageState extends State<IntroPage> {
   bool hidden = true;
+  final myController = TextEditingController();
+  final myController1 = TextEditingController(); //this is messy
 
   @override
   Widget build(BuildContext context) {
-    var id;
-    var name;
-
-    var hiddenIcon = Icon(
+    var visible = Icon(
       Icons.visibility,
     ); //these can be carried inside the metots
     var hiddenOff = Icon(Icons.visibility_off);
-    var icon = hidden ? hiddenOff : hiddenIcon;
+    var eyeIcon = hidden ? hiddenOff : visible;
 
     return Scaffold(
       appBar: AppBar(title: Text("this is the app var")),
-      body: loginField(icon, context),
+      body: loginField(eyeIcon, context),
     );
   }
 
-  Column loginField(Icon icon, BuildContext context) {
-    final myController = TextEditingController();
-    final myController1 = TextEditingController(); //this is messy
+  Column loginField(Icon eyeIcon, BuildContext context) {
     // Initialize with a default Department instance
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text("This is the first text"),
 
-        infoTextFields(icon, myController, myController1),
+        infoTextFields(eyeIcon, myController, myController1),
 
         ElevatedButton(
           onPressed: () async {
@@ -59,23 +56,16 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   Column infoTextFields(
-    Icon icon,
+    Icon eyeIcon,
     TextEditingController myController,
     TextEditingController myController1,
   ) {
-    @override
-    void dispose() {
-      // Clean up the controller when the widget is disposed.
-      myController.dispose();
-      myController1.dispose();
-      super.dispose();
-    }
-
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
+            //this field takes as string name TODO check empty
             obscureText: false,
             controller: myController,
             decoration: InputDecoration(
@@ -87,6 +77,7 @@ class _IntroPageState extends State<IntroPage> {
           ),
         ),
         SizedBox(height: 15),
+
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
@@ -99,7 +90,7 @@ class _IntroPageState extends State<IntroPage> {
               prefixIcon: Icon(Icons.lock),
 
               suffixIcon: IconButton(
-                icon: icon,
+                icon: eyeIcon,
                 onPressed: () {
                   setState(() {
                     hidden = !hidden;
@@ -113,5 +104,11 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 
-  void buttonPressed() {}
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    myController1.dispose();
+    super.dispose();
+  }
 }
