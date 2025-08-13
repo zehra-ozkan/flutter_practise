@@ -2,33 +2,29 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Try all possible URLs
-  final possibleUrls = [
-    'http://10.0.2.2:8080', // Android emulator
-    'http://localhost:8080', // iOS simulator/desktop
-    'http://192.168.1.10:8080', // Replace with your computer's IP
-  ];
 
-  for (var baseUrl in possibleUrls) {
-    print('\nAttempting connection to: $baseUrl');
+  final baseUrl = dotenv.get('API_BASE_URL');
 
-    try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/departments'))
-          .timeout(Duration(seconds: 5));
+  print('\nAttempting connection to: $baseUrl');
 
-      print('✅ Success! Status: ${response.statusCode}');
-      print('Response: ${response.body}');
-      return;
-    } on SocketException catch (e) {
-      print('🔴 Connection failed: ${e.message}');
-    } on TimeoutException catch (_) {
-      print('🕒 Request timed out');
-    } catch (e) {
-      print('❌ Error: $e');
-    }
+  try {
+    final response = await http
+        .get(Uri.parse('$baseUrl/departments'))
+        .timeout(Duration(seconds: 5));
+
+    print('✅ Success! Status: ${response.statusCode}');
+    print('Response: ${response.body}');
+    return;
+  } on SocketException catch (e) {
+    print('🔴 Connection failed: ${e.message}');
+  } on TimeoutException catch (_) {
+    print('🕒 Request timed out');
+  } catch (e) {
+    print('❌ Error: $e');
   }
 
   print('\n🔴🔴🔴 All connection attempts failed. Troubleshooting:');

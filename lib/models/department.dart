@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -8,13 +9,7 @@ class Department {
   final String uri = "";
   final int id;
   final String name;
-
-  //TODO fix the messiness
-  static final possibleUrls = [
-    'http://10.0.2.2:8080', // Android emulator
-    'http://localhost:8080', // iOS simulator/desktop
-    'http://192.168.1.10:8080', // Replace with your computer's IP this is also very messy
-  ];
+  static String baseUrl = dotenv.get('API_BASE_URL');
 
   Department({required this.id, required this.name});
 
@@ -25,26 +20,24 @@ class Department {
   Map<String, dynamic> toJson() => {'id': id, 'name': name};
 
   static Future<Department> getDepartmentById(int id) async {
-    for (var baseUrl in possibleUrls) {
-      try {
-        final response = await http
-            .get(Uri.parse('$baseUrl/departments/$id'))
-            .timeout(Duration(seconds: 5));
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/departments/$id'))
+          .timeout(Duration(seconds: 5));
 
-        final obj = jsonDecode(response.body);
+      final obj = jsonDecode(response.body);
 
-        Department dp = Department(id: obj['id'], name: obj['name']);
+      Department dp = Department(id: obj['id'], name: obj['name']);
 
-        print('✅ Success! Status: ${response.statusCode}');
-        print('Response: ${response.body}');
-        return dp;
-      } on SocketException catch (e) {
-        print('🔴 Connection failed: ${e.message}');
-      } on TimeoutException catch (_) {
-        print('🕒 Request timed out');
-      } catch (e) {
-        print('❌ Error: $e');
-      }
+      print('✅ Success! Status: ${response.statusCode}');
+      print('Response: ${response.body}');
+      return dp;
+    } on SocketException catch (e) {
+      print('🔴 Connection failed: ${e.message}');
+    } on TimeoutException catch (_) {
+      print('🕒 Request timed out');
+    } catch (e) {
+      print('❌ Error: $e');
     }
     throw "Unable to retrieve stock data.";
   }
