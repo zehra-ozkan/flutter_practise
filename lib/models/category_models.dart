@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CategoryModel {
+  //this class if for modelling the plates
   String name;
   String iconPath;
   Color boxColor;

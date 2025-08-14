@@ -1,9 +1,13 @@
-import 'package:fitness/models/department.dart';
+import 'package:fitness/models/ApiService.dart';
+import 'package:fitness/models/Department.dart';
+import 'package:fitness/models/DepartmentRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // The 'as http' part is crucial
 
 class IntroPage extends StatefulWidget {
-  const IntroPage({super.key});
+  final DepartmentRepository depRepo; // Store as a field
+
+  const IntroPage({required this.depRepo, super.key});
   //bool hidden = true;
   @override
   State<IntroPage> createState() => _IntroPageState();
@@ -39,16 +43,20 @@ class _IntroPageState extends State<IntroPage> {
 
         ElevatedButton(
           onPressed: () async {
-            bool k = await Department.isValid(
+            /*             bool valid = await Department.isValid(
               int.tryParse(myController1.text) ?? 0,
               myController.text,
-            );
-            if (k) {
+            ); */
+            var textId = int.tryParse(myController1.text);
+            var textName = myController.text;
+            bool valid = await widget.depRepo.isValid(textId!, textName);
+            if (valid) {
               Navigator.pushNamed(context, "/homepage");
             } else {
               print("I have failed\n");
             }
           },
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
           child: Text("this is the button"),
         ),
       ],

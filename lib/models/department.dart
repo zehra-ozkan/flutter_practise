@@ -6,10 +6,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class Department {
-  final String uri = "";
+  //final String uri = "";
   final int id;
   final String name;
-  static String baseUrl = dotenv.get('API_BASE_URL');
+  //  static String baseUrl = dotenv.get('API_BASE_URL');
 
   Department({required this.id, required this.name});
 
@@ -18,7 +18,7 @@ class Department {
   }
 
   Map<String, dynamic> toJson() => {'id': id, 'name': name};
-
+  /* 
   static Future<Department> getDepartmentById(int id) async {
     try {
       final response = await http
@@ -50,5 +50,5 @@ class Department {
       print('❌ Error in isValid: $e');
       return false;
     }
-  }
+  } */
 }

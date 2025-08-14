@@ -1,4 +1,5 @@
 import 'package:fitness/models/category_models.dart';
+import 'package:fitness/models/recommendation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -7,19 +8,29 @@ class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   List<CategoryModel> models = [];
+  List<Recommandation> recModels = [];
 
   void _getCategories() {
     models = CategoryModel.getCategories();
   }
 
+  void _getRecommendations() {
+    recModels = Recommandation.getRecommendations();
+  }
+
+  void _setModels() {
+    _getCategories();
+    _getRecommendations();
+  }
+
   @override
   void initState() {
-    _getCategories();
+    _setModels();
   }
 
   @override
   Widget build(BuildContext context) {
-    _getCategories();
+    _setModels();
 
     return Scaffold(
       appBar: appBar(context),
@@ -32,6 +43,100 @@ class HomePage extends StatelessWidget {
             height: 40,
           ), //this is to seperate the search bar form the category text
           _categoriesSection(),
+          SizedBox(height: 30),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Text(
+                  "Recommendation for diet",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600, //I am
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                height: 240,
+                padding: EdgeInsets.only(left: 20, right: 20),
+
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recModels.length,
+                  separatorBuilder: (context, index) => SizedBox(width: 25),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: recModels[index].boxColor.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      width: 150,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 8.0,
+                              right: 8.0,
+                            ),
+                            child: Image(
+                              image: AssetImage(recModels[index].iconPath),
+                              height: 80,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                recModels[index].name,
+                                style: TextStyle(
+                                  fontSize: 14, //
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+
+                              Text(
+                                "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
+                                style: TextStyle(
+                                  fontSize: 12, //
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromARGB(
+                                    255,
+                                    101,
+                                    101,
+                                    101,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ElevatedButton(
+                            /*            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.amber,
+                              backgroundColor: recModels[index].boxColor,
+                            ), */
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                recModels[index].boxColor,
+                              ),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                Colors.white,
+                              ), // White text
+                            ),
+                            onPressed: onPressed({}),
+                            child: Text("View"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       //backgroundColor: Colors.white,
@@ -40,8 +145,7 @@ class HomePage extends StatelessWidget {
 
   Column _categoriesSection() {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start, //this takes the children to the left
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(
@@ -63,7 +167,6 @@ class HomePage extends StatelessWidget {
 
           // color: const Color.fromARGB(255, 0, 0, 0),
           padding: EdgeInsets.only(left: 20, right: 20),
-
           child: ListView.separated(
             //
             scrollDirection: Axis.horizontal,
@@ -245,4 +348,6 @@ class HomePage extends StatelessWidget {
       ],
     );
   }
+
+  onPressed(Map map) {}
 }

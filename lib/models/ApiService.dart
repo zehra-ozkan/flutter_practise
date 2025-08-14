@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  String baseUrl = dotenv.get('API_BASE_URL');
+  final String baseUrl = dotenv.get('API_BASE_URL');
+  ApiService();
 
   Future<List<dynamic>> getDepartments() async {
     final response = await http.get(Uri.parse('$baseUrl/departments'));
@@ -23,7 +24,18 @@ class ApiService {
     if (response.statusCode == 201) {
       return jsonDecode(response.body);
     }
-
     throw Exception('Failed to create department');
+  }
+
+  Future<dynamic> getDepartmentById(int id) async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/departments/$id'))
+        .timeout(Duration(seconds: 5)); //what happens if not found?
+    if (response.statusCode == 200) {
+      //200 means successfull
+
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to load departments');
   }
 }
