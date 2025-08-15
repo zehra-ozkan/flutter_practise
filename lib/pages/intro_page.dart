@@ -1,13 +1,15 @@
 import 'package:fitness/models/ApiService.dart';
 import 'package:fitness/models/Department.dart';
 import 'package:fitness/models/DepartmentRepository.dart';
+import 'package:fitness/models/UserRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // The 'as http' part is crucial
 
 class IntroPage extends StatefulWidget {
   final DepartmentRepository depRepo; // Store as a field
+  final UserRepository userRepo;
 
-  const IntroPage({required this.depRepo, super.key});
+  const IntroPage({required this.depRepo, required this.userRepo, super.key});
   //bool hidden = true;
   @override
   State<IntroPage> createState() => _IntroPageState();
@@ -15,8 +17,8 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   bool hidden = true;
-  final myController = TextEditingController();
-  final myController1 = TextEditingController(); //this is messy
+  final userNameField = TextEditingController();
+  final passwordField = TextEditingController(); //this is messy
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class _IntroPageState extends State<IntroPage> {
       children: [
         Text("This is the first text"),
 
-        infoTextFields(eyeIcon, myController, myController1),
+        infoTextFields(eyeIcon, userNameField, passwordField),
 
         ElevatedButton(
           onPressed: () async {
@@ -47,9 +49,13 @@ class _IntroPageState extends State<IntroPage> {
               int.tryParse(myController1.text) ?? 0,
               myController.text,
             ); */
-            var textId = int.tryParse(myController1.text);
-            var textName = myController.text;
-            bool valid = await widget.depRepo.isValid(textId!, textName);
+            var password = passwordField.text;
+            var userName = userNameField.text;
+            bool valid = await widget.userRepo.validateLogin(
+              userName,
+              password,
+            );
+            //  bool valid = await widget.depRepo.isValid(textId!, textName);
             if (valid) {
               Navigator.pushNamed(context, "/homepage");
             } else {
@@ -65,19 +71,20 @@ class _IntroPageState extends State<IntroPage> {
 
   Column infoTextFields(
     Icon eyeIcon,
-    TextEditingController myController,
-    TextEditingController myController1,
+    TextEditingController userNameField,
+    TextEditingController passwordField,
   ) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
             //this field takes as string name TODO check empty
             obscureText: false,
-            controller: myController,
+            controller: userNameField,
             decoration: InputDecoration(
-              labelText: "this is the label text 1",
+              labelText: "Enter User Name",
               contentPadding: EdgeInsets.all(15),
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.person_3),
@@ -90,9 +97,9 @@ class _IntroPageState extends State<IntroPage> {
           padding: const EdgeInsets.all(10.0),
           child: TextField(
             obscureText: hidden,
-            controller: myController1,
+            controller: passwordField,
             decoration: InputDecoration(
-              labelText: "this is the label text 2",
+              labelText: "Enter Password",
               contentPadding: EdgeInsets.all(15),
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.lock),
@@ -108,15 +115,27 @@ class _IntroPageState extends State<IntroPage> {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.only(left: 12.0, top: 5),
+          child: TextButton(
+            onPressed: () async {
+              print("lah lah lah");
+
+              Navigator.pushNamed(context, "/registerpage");
+            },
+            child: Text("First time here? Register to the app from here."),
+          ),
+        ),
       ],
     );
   }
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
-    myController.dispose();
-    myController1.dispose();
     super.dispose();
+
+    // Clean up the controller when the widget is disposed.
+    userNameField.dispose();
+    passwordField.dispose();
   }
 }

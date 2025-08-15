@@ -33,6 +33,8 @@ class HomePage extends StatelessWidget {
     _setModels();
 
     return Scaffold(
+      resizeToAvoidBottomInset:
+          false, //this fixed the overflow error when the keyboard appears
       appBar: appBar(context),
       backgroundColor: const Color.fromARGB(255, 217, 222, 231),
       body: Column(
@@ -44,102 +46,106 @@ class HomePage extends StatelessWidget {
           ), //this is to seperate the search bar form the category text
           _categoriesSection(),
           SizedBox(height: 30),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 15.0),
-                child: Text(
-                  "Recommendation for diet",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600, //I am
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                height: 240,
-                padding: EdgeInsets.only(left: 20, right: 20),
-
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: recModels.length,
-                  separatorBuilder: (context, index) => SizedBox(width: 25),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: recModels[index].boxColor.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      width: 150,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 8.0,
-                              right: 8.0,
-                            ),
-                            child: Image(
-                              image: AssetImage(recModels[index].iconPath),
-                              height: 80,
-                            ),
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                recModels[index].name,
-                                style: TextStyle(
-                                  fontSize: 14, //
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-
-                              Text(
-                                "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
-                                style: TextStyle(
-                                  fontSize: 12, //
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color.fromARGB(
-                                    255,
-                                    101,
-                                    101,
-                                    101,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
-                            /*            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.amber,
-                              backgroundColor: recModels[index].boxColor,
-                            ), */
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                recModels[index].boxColor,
-                              ),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                Colors.white,
-                              ), // White text
-                            ),
-                            onPressed: onPressed({}),
-                            child: Text("View"),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+          _recommendationsSection(),
         ],
       ),
       //backgroundColor: Colors.white,
+    );
+  }
+
+  Column _recommendationsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: Text(
+            "Recommendation for diet",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600, //I am
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
+        Container(
+          height: 240,
+          padding: EdgeInsets.only(left: 20, right: 20),
+
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: recModels.length,
+            separatorBuilder: (context, index) => SizedBox(width: 25),
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: recModels[index].boxColor.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                      offset: Offset(8, 8),
+                    ),
+                  ],
+                ),
+                width: 150,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Image(
+                        image: AssetImage(recModels[index].iconPath),
+                        height: 80,
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          recModels[index].name,
+                          style: TextStyle(
+                            fontSize: 14, //
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
+                          style: TextStyle(
+                            fontSize: 12, //
+                            fontWeight: FontWeight.w400,
+                            //  color: const Color.fromARGB(255, 101, 101, 101),
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      /*            style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.amber,
+                            backgroundColor: recModels[index].boxColor,
+                          ), */
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          recModels[index].boxColor,
+                        ),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white,
+                        ), // White text
+                      ),
+                      onPressed: onPressed({}),
+                      child: Text("View"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -254,7 +260,7 @@ class HomePage extends StatelessWidget {
           suffixIcon: Container(
             width:
                 100, //without the with it takes up all the search bar to fix that a fixed size of the container is assigned
-            color: Colors.purple,
+            //color: Colors.purple,
             child: IntrinsicHeight(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,

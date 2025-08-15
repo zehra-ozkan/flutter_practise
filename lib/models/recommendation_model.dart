@@ -36,6 +36,18 @@ class Recommandation {
 
     rec.add(
       Recommandation(
+        name: "Honey Pancake",
+        iconPath: "assets/images/pancake.jpg",
+        level: "easy",
+        cal: "180cal",
+        duration: "30minx",
+        boxColor: Color.fromARGB(255, 52, 189, 93),
+        view: true,
+      ),
+    );
+
+    rec.add(
+      Recommandation(
         name: "Canadian Bread",
         iconPath: "assets/images/bread.jpg",
         level: "easy",
@@ -61,11 +73,35 @@ class Recommandation {
     rec.add(
       Recommandation(
         name: "Canadian Bread",
-        iconPath: "assets/images/bread.jpg",
+        iconPath: "assets/images/salad.jpg",
         level: "easy",
         cal: "190cal",
         duration: "20min",
-        boxColor: Color.fromARGB(255, 5, 154, 95),
+        boxColor: Color.fromARGB(255, 67, 5, 154),
+        view: false,
+      ),
+    );
+
+    rec.add(
+      Recommandation(
+        name: "Canadian Bread",
+        iconPath: "assets/images/smoothies.jpg",
+        level: "easy",
+        cal: "190cal",
+        duration: "20min",
+        boxColor: Color.fromARGB(255, 194, 100, 6),
+        view: false,
+      ),
+    );
+
+    rec.add(
+      Recommandation(
+        name: "Canadian Bread",
+        iconPath: "assets/images/pie.jpg",
+        level: "easy",
+        cal: "190cal",
+        duration: "20min",
+        boxColor: Color.fromARGB(255, 5, 87, 154),
         view: false,
       ),
     );
