@@ -1,4 +1,4 @@
-import 'package:fitness/models/ApiService.dart';
+import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/Department.dart';
 
 class DepartmentRepository {

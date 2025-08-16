@@ -1,9 +1,10 @@
-import 'package:fitness/models/ApiService.dart';
+import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/Department.dart';
 import 'package:fitness/models/DepartmentRepository.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // The 'as http' part is crucial
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart'; // The 'as http' part is crucial
 
 class IntroPage extends StatefulWidget {
   final DepartmentRepository depRepo; // Store as a field
@@ -51,12 +52,18 @@ class _IntroPageState extends State<IntroPage> {
             ); */
             var password = passwordField.text;
             var userName = userNameField.text;
-            var valid = await widget.userRepo.validateLogin(userName, password);
+            var data = await widget.userRepo.validateLogin(userName, password);
 
-            bool k = valid['success'];
-            int id = valid['userId'];
+            bool valid = data['success'];
+            int id = data['userId'];
             //  bool valid = await widget.depRepo.isValid(textId!, textName);
-            if (k) {
+            if (valid) {
+              /*               final prefs = await SharedPreferences.getInstance();
+              prefs.setInt(
+                'userId',
+                id,
+              ); //htis will apperantly keep the user logged in? I hope */
+
               Navigator.pushNamed(context, "/homepage");
             } else {
               print("I have failed\n");

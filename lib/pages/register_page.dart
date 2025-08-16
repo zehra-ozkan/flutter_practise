@@ -1,4 +1,5 @@
 import 'package:fitness/models/category_models.dart';
+import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -9,6 +10,7 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dayController = TextEditingController();
   final TextEditingController pass2Controller = TextEditingController();
+  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +24,26 @@ class RegisterPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: a(
-                  "Please Enter your birthday",
-                  Icon(Icons.date_range_outlined),
-                  nameController,
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.calendar_today),
+                    labelText: 'Select Date',
+                    //enabledBorder: InputBorder.none,
+                    // focusedBorder: InputBorder.none,
+                    border: OutlineInputBorder(),
+                  ),
+                  child: InputDatePickerFormField(
+                    firstDate: DateTime(2020, 5, 5),
+                    lastDate: DateTime(2025, 12, 15),
+                    fieldLabelText: "",
+                    onDateSubmitted: (date) {
+                      selectedDate = date; // This gives you the selected date
+                      print('Selected date: $date');
+                    },
+                  ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
                 child: a(
