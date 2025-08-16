@@ -6,7 +6,7 @@ class UserRepository {
 
   UserRepository(this.service);
 
-  Future<bool> isValid(String name, String password) async {
+  /*   Future<bool> isValid(String name, String password) async { //unnecessary
     try {
       final obj = await service.getUserByName(name);
       User user = User(
@@ -20,13 +20,23 @@ class UserRepository {
       print("SOMETHİNG IS WROONG!!!!!!!!!!!!!!!!!");
       return false;
     }
-  }
+  } */
 
   Future<Map<String, dynamic>> validateLogin(
     String userName,
     String password,
   ) async {
     final a = service.validateLogin(userName, password);
+    //TODO maybe I can add checks here
+    return a;
+  }
+
+  Future<Map<String, dynamic>> validateRegistration(
+    String userName,
+    String password,
+    DateTime date,
+  ) async {
+    final a = service.validateRegistration(userName, password, date);
     //TODO maybe I can add checks here
     return a;
   }

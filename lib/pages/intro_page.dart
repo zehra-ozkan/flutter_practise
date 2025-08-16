@@ -7,10 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // The 'as http' part is crucial
 
 class IntroPage extends StatefulWidget {
-  final DepartmentRepository depRepo; // Store as a field
+  //final DepartmentRepository depRepo; // Store as a field
   final UserRepository userRepo;
 
-  const IntroPage({required this.depRepo, required this.userRepo, super.key});
+  const IntroPage({required this.userRepo, super.key});
   //bool hidden = true;
   @override
   State<IntroPage> createState() => _IntroPageState();

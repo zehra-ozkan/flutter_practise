@@ -31,13 +31,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins'), //login check later time
-      home: IntroPage(depRepo: departmentRepo, userRepo: userRepository),
+      home: IntroPage(userRepo: userRepository),
 
       routes: {
         '/homepage': (context) => HomePage(),
-        '/intropage': (context) =>
-            IntroPage(depRepo: departmentRepo, userRepo: userRepository),
-        '/registerpage': (context) => RegisterPage(),
+        '/intropage': (context) => IntroPage(userRepo: userRepository),
+        '/registerpage': (context) => RegisterPage(userRepo: userRepository),
       },
     );
   }

@@ -1,11 +1,14 @@
+import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
 import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+  RegisterPage({super.key, required this.userRepo});
+  final UserRepository userRepo;
 
-  List<CategoryModel> models = [];
+  //  List<CategoryModel> models = [];
   final TextEditingController pass1Controller = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dayController = TextEditingController();
@@ -24,31 +27,17 @@ class RegisterPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.calendar_today),
-                    labelText: 'Select Date',
-                    //enabledBorder: InputBorder.none,
-                    // focusedBorder: InputBorder.none,
-                    border: OutlineInputBorder(),
-                  ),
-                  child: InputDatePickerFormField(
-                    firstDate: DateTime(2020, 5, 5),
-                    lastDate: DateTime(2025, 12, 15),
-                    fieldLabelText: "",
-                    onDateSubmitted: (date) {
-                      selectedDate = date; // This gives you the selected date
-                      print('Selected date: $date');
-                    },
-                  ),
+                child: a(
+                  "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
+                  Icon(Icons.person_3),
+                  dayController,
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
                 child: a(
                   "Please Enter User Name",
-                  Icon(Icons.person_3),
+                  Icon(Icons.date_range_outlined),
                   dayController,
                 ),
               ),
@@ -72,11 +61,29 @@ class RegisterPage extends StatelessWidget {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
-              var name = nameController.text;
-              var day = dayController.text;
-              var pas1 = pass1Controller.text;
-              var pas2 = pass2Controller.text;
+            onPressed: () async {
+              String name = nameController.text;
+              String day = dayController.text;
+              String pas1 = pass1Controller.text;
+              String pas2 = pass2Controller.text;
+
+              /* if (pas2 != pas1) { //TODO VALIDATION
+
+    } */
+              DateTime date = DateTime(2025, 5, 30);
+              //DateTime justDate = DateTime(flutterDateTime.year, flutterDateTime.month, flutterDateTime.day);
+              var data = await userRepo.validateRegistration(
+                "nyanko",
+                "pas1",
+                date,
+              );
+              bool valid = data['success'];
+              if (valid) {
+                print("successful");
+                Navigator.pushNamed(context, "/intropage");
+              } else {
+                print("I have failed in registration\n");
+              }
             },
             child: Text("sdaf"),
           ),
@@ -98,4 +105,10 @@ class RegisterPage extends StatelessWidget {
       ),
     );
   }
+
+  void _onSelectionChanged(
+    DateRangePickerSelectionChangedArgs dateRangePickerSelectionChangedArgs,
+  ) {}
+
+  void _buttonPressed() async {}
 }

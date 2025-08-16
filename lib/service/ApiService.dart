@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -120,6 +121,41 @@ class ApiService {
       return {'success': false, 'userId': -1}; //this means wrong something
     } else {
       throw Exception('Failed to login: ${response.statusCode}');
+    }
+  }
+
+  Future<Map<String, dynamic>> validateRegistration(
+    String name,
+    String password,
+    DateTime date,
+  ) async {
+    try {
+      final credentials = {
+        'username': name,
+        'password': password,
+        'date': date.toIso8601String(),
+      };
+
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/app_users/register'), // Use the correct IP
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(credentials),
+          )
+          .timeout(Duration(seconds: 10)); // Increase timeout
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        return {'success': true, 'userId': responseBody['userId']};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'userId': -1};
+      } else {
+        throw Exception('HTTP Error: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Check server or network.');
+    } catch (e) {
+      throw Exception('Failed to register: $e');
     }
   }
 }
