@@ -91,18 +91,35 @@ class ApiService {
 
       return jsonDecode(response.body);
     }
+    print("status code === ");
+    print(response.statusCode);
     throw Exception('Failed to load USER');
   }
 
-  Future<bool> validateLogin(String name, String password) async {
-    final credentials = {'username': name, 'passwordHash': password};
+  Future<Map<String, dynamic>> validateLogin(
+    String name,
+    String password,
+  ) async {
+    final credentials = {'username': name, 'password': password};
     final response = await http
         .post(
           Uri.parse('$baseUrl/app_users/login'),
+          headers: {'Content-Type': 'application/json'},
           body: jsonEncode(credentials),
         )
         .timeout(Duration(seconds: 5));
-    if (response.statusCode == 200) return json.decode(response.body);
-    return false;
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(
+        response.body,
+      ); //responseda boolean key var onu çekiyor
+      final userId = responseBody['userId']; // Extract user ID
+      return {'success': true, 'userId': userId};
+      //return responseBody['success'] as bool; // Extract the boolean
+    } else if (response.statusCode == 401) {
+      return {'success': false, 'userId': -1}; //this means wrong something
+    } else {
+      throw Exception('Failed to login: ${response.statusCode}');
+    }
   }
 }

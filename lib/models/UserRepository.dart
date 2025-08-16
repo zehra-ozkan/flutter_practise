@@ -22,9 +22,12 @@ class UserRepository {
     }
   }
 
-  Future<bool> validateLogin(String userName, String password) async {
-    bool a = await service.validateLogin(userName, password);
-
+  Future<Map<String, dynamic>> validateLogin(
+    String userName,
+    String password,
+  ) async {
+    final a = service.validateLogin(userName, password);
+    //TODO maybe I can add checks here
     return a;
   }
 }

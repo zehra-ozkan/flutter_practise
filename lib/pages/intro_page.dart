@@ -51,12 +51,12 @@ class _IntroPageState extends State<IntroPage> {
             ); */
             var password = passwordField.text;
             var userName = userNameField.text;
-            bool valid = await widget.userRepo.validateLogin(
-              userName,
-              password,
-            );
+            var valid = await widget.userRepo.validateLogin(userName, password);
+
+            bool k = valid['success'];
+            int id = valid['userId'];
             //  bool valid = await widget.depRepo.isValid(textId!, textName);
-            if (valid) {
+            if (k) {
               Navigator.pushNamed(context, "/homepage");
             } else {
               print("I have failed\n");
