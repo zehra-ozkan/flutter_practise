@@ -28,17 +28,19 @@ class RegisterPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
                 child: a(
-                  "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
-                  Icon(Icons.person_3),
-                  dayController,
+                  "Please Enter User Name",
+                  Icon(Icons.date_range_outlined),
+                  nameController,
+                  validateName,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
                 child: a(
-                  "Please Enter User Name",
-                  Icon(Icons.date_range_outlined),
+                  "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
+                  Icon(Icons.person_3),
                   dayController,
+                  validateName,
                 ),
               ),
 
@@ -48,6 +50,7 @@ class RegisterPage extends StatelessWidget {
                   "Please Enter your password",
                   Icon(Icons.lock_outline_rounded),
                   pass1Controller,
+                  validatePassword,
                 ),
               ),
               Padding(
@@ -56,6 +59,7 @@ class RegisterPage extends StatelessWidget {
                   "Please Repeat your password",
                   Icon(Icons.lock_outline_rounded),
                   pass2Controller,
+                  validatePassword,
                 ),
               ),
             ],
@@ -92,8 +96,14 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  static TextField a(String txt, Icon icon, TextEditingController ctr) {
-    return TextField(
+  bool _validate = false;
+  TextFormField a(
+    String txt,
+    Icon icon,
+    TextEditingController ctr,
+    Function f,
+  ) {
+    return TextFormField(
       //this field takes as string name TODO check empty
       controller: ctr,
       obscureText: false,
@@ -101,9 +111,26 @@ class RegisterPage extends StatelessWidget {
         labelText: txt,
         contentPadding: EdgeInsets.all(15),
         border: OutlineInputBorder(),
+        errorText: f(ctr.text) == "" ? null : f(ctr.text),
         prefixIcon: icon,
       ),
     );
+  }
+
+  String validatePassword(String value) {
+    print("values = " + value);
+    if (!(value.length < 8) && value.isNotEmpty) {
+      print("here!!");
+      return "Password should contain at least 8 characters!";
+    }
+    return "";
+  }
+
+  String validateName(String value) {
+    if (value.isEmpty == false) {
+      return "This name already exists.";
+    }
+    return "";
   }
 
   void _onSelectionChanged(
