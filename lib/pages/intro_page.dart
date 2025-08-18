@@ -20,6 +20,7 @@ class _IntroPageState extends State<IntroPage> {
   bool hidden = true;
   final userNameField = TextEditingController();
   final passwordField = TextEditingController(); //this is messy
+  String? failMessage = null; //I will set it initially to null
 
   @override
   Widget build(BuildContext context) {
@@ -58,19 +59,16 @@ class _IntroPageState extends State<IntroPage> {
             int id = data['userId'];
             //  bool valid = await widget.depRepo.isValid(textId!, textName);
             if (valid) {
-              /*               final prefs = await SharedPreferences.getInstance();
-              prefs.setInt(
-                'userId',
-                id,
-              ); //htis will apperantly keep the user logged in? I hope */
-
               Navigator.pushNamed(context, "/homepage");
             } else {
-              print("I have failed\n");
+              print("failed login");
+              setState(() {
+                failMessage = "UserName or Password wrong";
+              });
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-          child: Text("this is the button"),
+          child: Text("Log In"),
         ),
       ],
     );
@@ -122,6 +120,14 @@ class _IntroPageState extends State<IntroPage> {
             ),
           ),
         ),
+        if (failMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, top: 5),
+            child: Text(
+              failMessage!,
+              style: TextStyle(color: const Color.fromARGB(255, 177, 35, 25)),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.only(left: 12.0, top: 5),
           child: TextButton(
