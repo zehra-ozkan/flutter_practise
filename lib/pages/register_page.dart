@@ -4,16 +4,24 @@ import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   RegisterPage({super.key, required this.userRepo});
   final UserRepository userRepo;
 
-  //  List<CategoryModel> models = [];
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController pass1Controller = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dayController = TextEditingController();
   final TextEditingController pass2Controller = TextEditingController();
   DateTime? selectedDate;
+  final _formKey = GlobalKey<FormState>();
+
+  String? passwordError; // For password mismatch
+  String? nameError; // For name availability
 
   @override
   Widget build(BuildContext context) {
@@ -23,73 +31,121 @@ class RegisterPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         // crossAxisAlignment: CrossAxisAlignment.start, //to the left
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: a(
-                  "Please Enter User Name",
-                  Icon(Icons.date_range_outlined),
-                  nameController,
-                  validateName,
+          Form(
+            key: _formKey,
+            child: Column(
+              //this one wraps the input fields
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
+                  child: a(
+                    "Please Enter User Name",
+                    Icon(Icons.date_range_outlined),
+                    nameController,
+                    validateName,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: a(
-                  "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
-                  Icon(Icons.person_3),
-                  dayController,
-                  validateName,
-                ),
-              ),
+                if (nameError !=
+                    null) //this will appear after the button is clicked
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
 
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: a(
-                  "Please Enter your password",
-                  Icon(Icons.lock_outline_rounded),
-                  pass1Controller,
-                  validatePassword,
+                    child: Text(
+                      nameError!,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
+                  child: a(
+                    "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
+                    Icon(Icons.person_3),
+                    dayController,
+                    validatePassword,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
-                child: a(
-                  "Please Repeat your password",
-                  Icon(Icons.lock_outline_rounded),
-                  pass2Controller,
-                  validatePassword,
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
+                  child: a(
+                    "Please Enter your password",
+                    Icon(Icons.lock_outline_rounded),
+                    pass1Controller,
+                    validatePassword,
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
+                  child: a(
+                    "Please Repeat your password",
+                    Icon(Icons.lock_outline_rounded),
+                    pass2Controller,
+                    (value) =>
+                        validatePasswordMatch(value, pass1Controller.text),
+                  ),
+                ),
+                if (passwordError != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Text(
+                      passwordError!,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+              ],
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
-              String name = nameController.text;
-              String day = dayController.text;
-              String pas1 = pass1Controller.text;
-              String pas2 = pass2Controller.text;
+              if (_formKey.currentState!.validate()) {
+                //this part checks all the validators
+                // 2. Clear previous errors
+                setState(() {
+                  passwordError = null;
+                  nameError = null;
+                });
 
-              /* if (pas2 != pas1) { //TODO VALIDATION
+                // 3. Check password match
+                if (pass2Controller.text != pass1Controller.text) {
+                  setState(() {
+                    passwordError = "Passwords don't match";
+                  });
+                  return;
+                }
 
-    } */
-              DateTime date = DateTime(2025, 5, 30);
-              //DateTime justDate = DateTime(flutterDateTime.year, flutterDateTime.month, flutterDateTime.day);
-              var data = await userRepo.validateRegistration(
-                "nyanko",
-                "pas1",
-                date,
-              );
-              bool valid = data['success'];
-              if (valid) {
-                print("successful");
-                Navigator.pushNamed(context, "/intropage");
-              } else {
-                print("I have failed in registration\n");
+                // 4. Check name availability
+                bool validName = await widget.userRepo.isValidName(
+                  nameController.text,
+                );
+                if (!validName) {
+                  setState(() {
+                    nameError = "This name already exists";
+                  });
+                  return;
+                }
+                String name = nameController.text;
+                String day = dayController.text;
+                String pas1 = pass1Controller.text;
+                String pas2 = pass2Controller.text;
+
+                DateTime date = DateTime(2025, 5, 30);
+
+                var data = await widget.userRepo.validateRegistration(
+                  //the state can access its widget like this
+                  name,
+                  "pas1",
+                  date,
+                );
+                bool valid = data['success'];
+                if (valid) {
+                  print("successful");
+                  Navigator.pushNamed(context, "/intropage");
+                } else {
+                  print("I have failed in registration\n");
+                }
               }
             },
-            child: Text("sdaf"),
+            child: Text("Save New User"),
           ),
         ],
       ),
@@ -101,7 +157,7 @@ class RegisterPage extends StatelessWidget {
     String txt,
     Icon icon,
     TextEditingController ctr,
-    Function f,
+    String? Function(String?) validator,
   ) {
     return TextFormField(
       //this field takes as string name TODO check empty
@@ -111,31 +167,39 @@ class RegisterPage extends StatelessWidget {
         labelText: txt,
         contentPadding: EdgeInsets.all(15),
         border: OutlineInputBorder(),
-        errorText: f(ctr.text) == "" ? null : f(ctr.text),
+        errorText: validator(ctr.text),
         prefixIcon: icon,
       ),
+      validator:
+          validator, // Add this line to use Flutter's built-in validation
+      autovalidateMode: AutovalidateMode
+          .onUserInteraction, // Add this for real-time validation
     );
   }
 
-  String validatePassword(String value) {
-    print("values = " + value);
-    if (!(value.length < 8) && value.isNotEmpty) {
-      print("here!!");
+  String? validatePassword(String? value) {
+    // Changed to accept String?
+    if (value == null || value.isEmpty) return null;
+    if (value.length < 8) {
       return "Password should contain at least 8 characters!";
     }
-    return "";
+    return null;
   }
 
-  String validateName(String value) {
-    if (value.isEmpty == false) {
-      return "This name already exists.";
+  String? validateName(String? value) {
+    if (value == null || value.isEmpty) return null;
+    if (value.length < 5) {
+      return "User Name should contain at least 5 characters!";
     }
-    return "";
+    return null;
   }
 
-  void _onSelectionChanged(
-    DateRangePickerSelectionChangedArgs dateRangePickerSelectionChangedArgs,
-  ) {}
-
-  void _buttonPressed() async {}
+  String? validatePasswordMatch(String? value, String otherPassword) {
+    if (value == null || value.isEmpty) {
+      return "Please repeat your password";
+    } else if (value != otherPassword) {
+      return "Passwords don't match";
+    }
+    return null;
+  }
 }

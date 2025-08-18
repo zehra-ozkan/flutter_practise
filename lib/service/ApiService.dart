@@ -89,7 +89,7 @@ class ApiService {
         .timeout(Duration(seconds: 5)); //what happens if not found?
     if (response.statusCode == 200) {
       //200 means successfull
-
+      print("successfully fetched the user");
       return jsonDecode(response.body);
     }
     print("status code === ");

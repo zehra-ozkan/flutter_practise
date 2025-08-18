@@ -6,21 +6,24 @@ class UserRepository {
 
   UserRepository(this.service);
 
-  /*   Future<bool> isValid(String name, String password) async { //unnecessary
+  Future<bool> isValidName(String name) async {
+    //this metot will check whether there is a user with the existing name
     try {
       final obj = await service.getUserByName(name);
-      User user = User(
+      /*       User user = User(
         userId: obj['user_id'],
-        userName: obj['user_name'],
-        birthday: obj['birthday'],
+        userName: obj['userName'],
+        birthday:  obj['birthday'], //for some reason there is a problem with converting date to string??
         password: obj['user_password'],
-      );
-      return user.password == password;
-    } catch (e) {
-      print("SOMETHİNG IS WROONG!!!!!!!!!!!!!!!!!");
+      ); */
+
       return false;
+    } catch (e) {
+      print(e);
+      print("User with name " + name + " does not exits.");
+      return true;
     }
-  } */
+  }
 
   Future<Map<String, dynamic>> validateLogin(
     String userName,
