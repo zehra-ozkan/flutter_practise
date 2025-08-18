@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:fitness/models/User.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -83,6 +84,41 @@ class ApiService {
     throw Exception('Failed to load USER');
   }
 
+  Future<User> getCurrentUser(String sessionId) async {
+    try {
+      try {
+        final testResponse = await http
+            .get(Uri.parse('$baseUrl/'))
+            .timeout(Duration(seconds: 5));
+        print("Backend reachable: ${testResponse.statusCode}");
+      } catch (e) {
+        print("Cannot reach backend: $e");
+      }
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/current-user'),
+            headers: {'Session-ID': sessionId}, // Critical: Include session ID
+          )
+          .timeout(const Duration(seconds: 5));
+
+      switch (response.statusCode) {
+        case 200:
+          print("I have successfully reached here");
+          final json = jsonDecode(response.body) as Map<String, dynamic>;
+          return User.fromJson(json);
+
+        default:
+          throw Exception(
+            'Server error=====================================0: ${response.statusCode}',
+          );
+      }
+    } on TimeoutException {
+      throw TimeoutException('Connection timed out');
+    } on http.ClientException {
+      throw Exception('Network error');
+    }
+  }
+
   Future<dynamic> getUserByName(String name) async {
     final response = await http
         .get(Uri.parse('$baseUrl/app_users/name/$name'))
@@ -115,12 +151,24 @@ class ApiService {
         response.body,
       ); //responseda boolean key var onu çekiyor
       final userId = responseBody['userId']; // Extract user ID
-      return {'success': true, 'userId': userId};
+      return {
+        'success': true,
+        'userId': userId,
+        'sessionId': responseBody['sessionId'],
+      };
       //return responseBody['success'] as bool; // Extract the boolean
     } else if (response.statusCode == 401) {
-      return {'success': false, 'userId': -1}; //this means wrong something
+      return {
+        'success': false,
+        'userId': -1,
+        'sessionId': "-1",
+      }; //this means wrong something
     } else {
-      throw Exception('Failed to login: ${response.statusCode}');
+      return {
+        'success': false,
+        'userId': -1,
+        'sessionId': "-1",
+      }; //this means wrong something
     }
   }
 

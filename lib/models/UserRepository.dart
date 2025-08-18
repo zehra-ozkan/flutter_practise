@@ -43,4 +43,8 @@ class UserRepository {
     //TODO maybe I can add checks here
     return a;
   }
+
+  Future<User> getCurrentUser(String sessionId) async {
+    return service.getCurrentUser(sessionId);
+  }
 }

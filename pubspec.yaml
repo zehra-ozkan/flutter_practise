@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.2.0
   shared_preferences: ^2.5.3
+  provider: ^6.1.5
   date_picker_plus: ^3.0.2
   syncfusion_flutter_datepicker: ^30.2.5
 

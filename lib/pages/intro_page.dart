@@ -1,3 +1,4 @@
+import 'package:fitness/pages/home.dart';
 import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/Department.dart';
 import 'package:fitness/models/DepartmentRepository.dart';
@@ -5,6 +6,8 @@ import 'package:fitness/models/UserRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // The 'as http' part is crucial
+
+String? sessionId; // Store this globally after login
 
 class IntroPage extends StatefulWidget {
   //final DepartmentRepository depRepo; // Store as a field
@@ -47,19 +50,20 @@ class _IntroPageState extends State<IntroPage> {
 
         ElevatedButton(
           onPressed: () async {
-            /*             bool valid = await Department.isValid(
-              int.tryParse(myController1.text) ?? 0,
-              myController.text,
-            ); */
             var password = passwordField.text;
             var userName = userNameField.text;
             var data = await widget.userRepo.validateLogin(userName, password);
 
             bool valid = data['success'];
             int id = data['userId'];
-            //  bool valid = await widget.depRepo.isValid(textId!, textName);
+            sessionId = data['sessionId'];
             if (valid) {
-              Navigator.pushNamed(context, "/homepage");
+              print("wea re valid:");
+              Navigator.pushReplacementNamed(
+                context,
+                '/homepage',
+                arguments: {'userId': id},
+              );
             } else {
               print("failed login");
               setState(() {

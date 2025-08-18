@@ -1,14 +1,25 @@
+import 'package:fitness/models/User.dart';
+import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
 import 'package:fitness/models/recommendation_model.dart';
+import 'package:fitness/pages/intro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   List<CategoryModel> models = [];
+  UserRepository? userRepo;
   List<Recommandation> recModels = [];
+  User? user;
 
   void _getCategories() {
     models = CategoryModel.getCategories();
@@ -18,6 +29,17 @@ class HomePage extends StatelessWidget {
     recModels = Recommandation.getRecommendations();
   }
 
+  Future<void> _getUser() async {
+    // Add 'async'
+    if (userRepo != null && sessionId != null) {
+      user = await userRepo!.getCurrentUser(sessionId!);
+      return;
+    }
+    if (userRepo == null) print("That is not supposed to happen");
+    if (sessionId == null) print("session id is null");
+    print("we are in else");
+  }
+
   void _setModels() {
     _getCategories();
     _getRecommendations();
@@ -25,6 +47,11 @@ class HomePage extends StatelessWidget {
 
   @override
   void initState() {
+    super.initState();
+    userRepo = Provider.of<UserRepository>(context, listen: false);
+    _getUser();
+
+    print("user name is ${user?.userName}");
     _setModels();
   }
 
