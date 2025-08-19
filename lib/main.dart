@@ -35,6 +35,8 @@ class MyApp extends StatelessWidget {
 
       routes: {
         '/homepage': (context) => HomePage(), //I will make it an invalid userId
+        '/postspage': (context) =>
+            HomePage(), //I will make it an invalid userId
         '/intropage': (context) => IntroPage(userRepo: userRepo),
         '/registerpage': (context) => RegisterPage(userRepo: userRepo),
       },

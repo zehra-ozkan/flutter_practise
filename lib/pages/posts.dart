@@ -8,14 +8,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class HomePage extends StatefulWidget {
-  HomePage({super.key});
+class Posts extends StatefulWidget {
+  Posts({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Posts> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<Posts> {
   List<CategoryModel> models = [];
   UserRepository? userRepo;
   List<Recommandation> recModels = [];
@@ -48,10 +48,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    /*     userRepo = Provider.of<UserRepository>(context, listen: false);
+    userRepo = Provider.of<UserRepository>(context, listen: false);
     _getUser();
 
-    print("user name is ${user?.userName}"); */
+    print("user name is ${user?.userName}");
     _setModels();
   }
 
@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          //this part does the search field I extracted it as a method
+          _searchField(), //this part does the search field I extracted it as a method
           SizedBox(
             height: 40,
           ), //this is to seperate the search bar form the category text
@@ -75,17 +75,14 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 30),
           _recommendationsSection(),
           SizedBox(height: 30),
-          /* 
+
           Padding(
             padding: const EdgeInsets.all(14.0),
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/postspage");
-              },
+              onPressed: () {},
               child: Text("See All Posts"),
             ),
-          ), */
-          _searchField(),
+          ),
         ],
       ),
       //backgroundColor: Colors.white,
@@ -109,72 +106,96 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(height: 10),
         Container(
-          height: 370,
+          height: 270,
           padding: EdgeInsets.only(left: 20, right: 20),
 
           child: ListView.separated(
-            scrollDirection: Axis.vertical,
+            scrollDirection: Axis.horizontal,
             itemCount: recModels.length,
-            separatorBuilder: (context, index) => SizedBox(height: 25),
+            separatorBuilder: (context, index) => SizedBox(width: 25),
             itemBuilder: (context, index) {
-              return Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: recModels[index].boxColor.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 3,
-                          blurRadius: 7,
-                          offset: Offset(8, 8),
-                        ),
-                      ],
+              return Container(
+                decoration: BoxDecoration(
+                  color: recModels[index].boxColor.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                      offset: Offset(8, 8),
                     ),
-                    height: 180,
-                    child: Padding(
+                  ],
+                ),
+                width: 180,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                       child: Image(
                         image: AssetImage(recModels[index].iconPath),
                         height: 80,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(25)),
-                        color: Colors.amber,
-                      ),
-                      child: Icon(Icons.person_3_sharp),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        recModels[index].name,
-                        style: TextStyle(
-                          fontSize: 14, //
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      SizedBox(
-                        width: 45,
-                        child: Text(
-                          "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
-                          style: TextStyle(
-                            fontSize: 12, //
-                            fontWeight: FontWeight.w400,
-                            //  color: const Color.fromARGB(255, 101, 101, 101),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(25),
+                              ),
+                              color: Colors.amber,
+                            ),
+                            child: Icon(Icons.person_3_sharp),
                           ),
                         ),
+                        Column(
+                          children: [
+                            Text(
+                              recModels[index].name,
+                              style: TextStyle(
+                                fontSize: 14, //
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(
+                              width: 45,
+                              child: Text(
+                                "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
+                                style: TextStyle(
+                                  fontSize: 12, //
+                                  fontWeight: FontWeight.w400,
+                                  //  color: const Color.fromARGB(255, 101, 101, 101),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    /* ElevatedButton(
+                      /*            style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.amber,
+                            backgroundColor: recModels[index].boxColor,
+                          ), */
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          recModels[index].boxColor,
+                        ),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white,
+                        ), // White text
                       ),
-                    ],
-                  ),
-                ],
+                      onPressed: onPressed({}),
+                      child: Text("View"),
+                    ), */
+                  ],
+                ),
               );
             },
           ),
@@ -347,7 +368,7 @@ class _HomePageState extends State<HomePage> {
 
       leading: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, "/homepage");
+          Navigator.pushNamed(context, "/intropage");
         },
         child: Container(
           margin: EdgeInsets.all(10),
