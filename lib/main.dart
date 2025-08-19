@@ -1,3 +1,5 @@
+import 'package:fitness/pages/posts_page.dart';
+import 'package:fitness/pages/profile_page.dart';
 import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/DepartmentRepository.dart';
 import 'package:fitness/models/UserRepository.dart';
@@ -35,8 +37,9 @@ class MyApp extends StatelessWidget {
 
       routes: {
         '/homepage': (context) => HomePage(), //I will make it an invalid userId
-        '/postspage': (context) =>
-            HomePage(), //I will make it an invalid userId
+        '/profilepage': (context) =>
+            ProfilePage(), //I will make it an invalid userId
+        '/postspage': (context) => Posts(), //I will make it an invalid userId
         '/intropage': (context) => IntroPage(userRepo: userRepo),
         '/registerpage': (context) => RegisterPage(userRepo: userRepo),
       },

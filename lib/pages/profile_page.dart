@@ -8,14 +8,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class HomePage extends StatefulWidget {
-  HomePage({super.key});
+class ProfilePage extends StatefulWidget {
+  ProfilePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ProfilePageState extends State<ProfilePage> {
   List<CategoryModel> models = [];
   UserRepository? userRepo;
   List<Recommandation> recModels = [];
@@ -64,14 +64,74 @@ class _HomePageState extends State<HomePage> {
           false, //this fixed the overflow error when the keyboard appears
       appBar: appBar(context),
       backgroundColor: const Color.fromARGB(255, 217, 222, 231),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      body: ListView(
+        //crossAxisAlignment: CrossAxisAlignment.center,
+        scrollDirection: Axis.vertical,
         children: [
-          _searchField(), //this part does the search field I extracted it as a method
+          _profilePic(),
           SizedBox(
-            height: 40,
+            height: 20,
           ), //this is to seperate the search bar form the category text
-          // _categoriesSection(),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text(
+                  "Name : ",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600, //I am
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "whoever you are",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500, //I am
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text(
+                  "Birthday : ",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600, //I am
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "whenever that is",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500, //I am
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          _friendsSection(),
           SizedBox(height: 30),
           _recommendationsSection(),
           SizedBox(height: 30),
@@ -91,6 +151,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Container _profilePic() {
+    //TODO fix the circle
+    return Container(
+      child: ColoredBox(
+        color: Colors.blue,
+        child: SizedBox(
+          width: 80,
+          /*         decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            color: Colors.greenAccent,
+          ), */
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.person_3_sharp, size: 80), //profile picture size
+          ),
+        ),
+      ),
+    );
+  }
+
   Column _recommendationsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +178,7 @@ class _HomePageState extends State<HomePage> {
         Padding(
           padding: const EdgeInsets.only(left: 15.0),
           child: Text(
-            "Your Friends Posted:",
+            "My posts",
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -180,22 +260,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    /* ElevatedButton(
-                      /*            style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.amber,
-                            backgroundColor: recModels[index].boxColor,
-                          ), */
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          recModels[index].boxColor,
-                        ),
-                        foregroundColor: MaterialStateProperty.all<Color>(
-                          Colors.white,
-                        ), // White text
-                      ),
-                      onPressed: onPressed({}),
-                      child: Text("View"),
-                    ), */
                   ],
                 ),
               );
@@ -206,7 +270,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Column _categoriesSection() {
+  Column _friendsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,7 +279,7 @@ class _HomePageState extends State<HomePage> {
             left: 20.0,
           ), //the left blank space for the category
           child: Text(
-            "Category",
+            "My Friends:",
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -235,24 +299,14 @@ class _HomePageState extends State<HomePage> {
             scrollDirection: Axis.horizontal,
             itemCount: models.length,
             separatorBuilder: (context, index) =>
-                SizedBox(width: 25), //this seperates the boxes from each other
+                SizedBox(width: 5), //this seperates the boxes from each other
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  color: models[index].boxColor.withOpacity(0.5), //
-                  //below code makes the shadow
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 7,
-                      offset: Offset(8, 8),
-                    ),
-                  ],
                 ),
 
-                width: 100,
+                width: 80,
 
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -266,12 +320,8 @@ class _HomePageState extends State<HomePage> {
                       height: 60,
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.circular(15),
-                          child: Image(
-                            image: AssetImage(models[index].iconPath),
-                          ),
-                        ),
+
+                        child: Icon(Icons.person),
                       ),
                     ),
                     Text(
@@ -356,21 +406,13 @@ class _HomePageState extends State<HomePage> {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
-      backgroundColor: const Color.fromARGB(0, 244, 67, 54),
-      title: Text(
-        "Hello Whoever You are",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ), //please do not mess up this part
       centerTitle: true,
+      backgroundColor: const Color.fromARGB(0, 0, 0, 0),
       elevation: 0.0, //this is the shadow
 
       leading: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, "/intropage");
+          Navigator.pushNamed(context, "/homepage");
         },
         child: Container(
           margin: EdgeInsets.all(10),
@@ -380,35 +422,9 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(10),
           ),
           //child: SvgPicture.asset("assets/icons/back-svgrepo-com.svg"),
-          child: Icon(
-            Icons.arrow_back,
-            size: 24,
-          ), // I can also use flutter's icons
+          child: Icon(Icons.home, size: 24), // I can also use flutter's icons
         ),
       ),
-
-      actions: [
-        GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, "/profilepage");
-          },
-          child: Container(
-            //this is the bar on top
-            width: 37,
-            margin: EdgeInsets.all(10),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 207, 221, 246), //I like this color
-              borderRadius: BorderRadius.circular(10),
-            ),
-            /* a */
-            child: Icon(
-              Icons.person,
-              size: 24,
-            ), // I can also use flutter's icons
-          ),
-        ),
-      ],
     );
   }
 }
