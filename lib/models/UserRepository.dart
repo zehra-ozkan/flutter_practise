@@ -6,30 +6,11 @@ class UserRepository {
 
   UserRepository(this.service);
 
-  Future<bool> isValidName(String name) async {
-    //this metot will check whether there is a user with the existing name
-    try {
-      final obj = await service.getUserByName(name);
-      /*       User user = User(
-        userId: obj['user_id'],
-        userName: obj['userName'],
-        birthday:  obj['birthday'], //for some reason there is a problem with converting date to string??
-        password: obj['user_password'],
-      ); */
+  //is valid name will be done inside the addUser metod
 
-      return false;
-    } catch (e) {
-      print(e);
-      print("User with name " + name + " does not exits.");
-      return true;
-    }
-  }
-
-  Future<Map<String, dynamic>> validateLogin(
-    String userName,
-    String password,
-  ) async {
+  Future<String?> validateLogin(String userName, String password) async {
     final a = service.validateLogin(userName, password);
+    print("we are in a ");
     //TODO maybe I can add checks here
     return a;
   }

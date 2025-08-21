@@ -52,18 +52,15 @@ class _IntroPageState extends State<IntroPage> {
           onPressed: () async {
             var password = passwordField.text;
             var userName = userNameField.text;
-            var data = await widget.userRepo.validateLogin(userName, password);
+            String? token = await widget.userRepo.validateLogin(
+              userName,
+              password,
+            );
 
-            bool valid = data['success'];
-            int id = data['userId'];
-            sessionId = data['sessionId'];
-            if (valid) {
+            if (token != null) {
               print("wea re valid:");
-              Navigator.pushReplacementNamed(
-                context,
-                '/homepage',
-                arguments: {'userId': id},
-              );
+              print("login successfll");
+              Navigator.pushNamed(context, "/homepage");
             } else {
               print("failed login");
               setState(() {

@@ -114,15 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
 
                 // 4. Check name availability
-                bool validName = await widget.userRepo.isValidName(
-                  nameController.text,
-                );
-                if (!validName) {
-                  setState(() {
-                    nameError = "This name already exists";
-                  });
-                  return;
-                }
+
                 String name = nameController.text;
                 String day = dayController.text;
                 String pas1 = pass1Controller.text;
@@ -136,12 +128,17 @@ class _RegisterPageState extends State<RegisterPage> {
                   "pas1",
                   date,
                 );
+
                 bool valid = data['success'];
                 if (valid) {
                   print("successful");
                   Navigator.pushNamed(context, "/intropage");
                 } else {
                   print("I have failed in registration\n");
+                  setState(() {
+                    nameError = "This name already exists";
+                  });
+                  return;
                 }
               }
             },

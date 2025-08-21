@@ -133,55 +133,58 @@ class ApiService {
     throw Exception('Failed to load USER');
   }
 
-  Future<Map<String, dynamic>> validateLogin(
-    String name,
-    String password,
-  ) async {
-    final credentials = {'username': name, 'password': password};
-    final response = await http
-        .post(
-          Uri.parse('$baseUrl/app_users/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(credentials),
-        )
-        .timeout(Duration(seconds: 5));
+  Future<String?> validateLogin(String name, String password) async {
+    try {
+      final credentials = {'userName': name, 'user_password': password};
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/app_users/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(credentials),
+          )
+          .timeout(Duration(seconds: 5));
 
-    if (response.statusCode == 200) {
-      final responseBody = json.decode(
-        response.body,
-      ); //responseda boolean key var onu çekiyor
-      final userId = responseBody['userId']; // Extract user ID
-      return {
-        'success': true,
-        'userId': userId,
-        'sessionId': responseBody['sessionId'],
-      };
-      //return responseBody['success'] as bool; // Extract the boolean
-    } else if (response.statusCode == 401) {
-      return {
-        'success': false,
-        'userId': -1,
-        'sessionId': "-1",
-      }; //this means wrong something
-    } else {
-      return {
-        'success': false,
-        'userId': -1,
-        'sessionId': "-1",
-      }; //this means wrong something
+      print("Response status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+
+        if (responseBody["success"] == true) {
+          return responseBody["token"];
+        } else {
+          print("Login failed: success=false");
+          return null;
+        }
+      } else if (response.statusCode == 401) {
+        print("Unauthorized: Invalid credentials");
+        return null;
+      } else {
+        print("Server error: ${response.statusCode}");
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      print("Request timeout");
+      throw Exception('Connection timeout');
+    } on http.ClientException catch (e) {
+      print("Client exception: $e");
+      throw Exception('Network error: $e');
+    } catch (e) {
+      print("Unexpected error: $e");
+      throw Exception('Unexpected error: $e');
     }
   }
 
   Future<Map<String, dynamic>> validateRegistration(
-    String name,
+    String userName,
     String password,
     DateTime date,
   ) async {
     try {
       final credentials = {
-        'username': name,
-        'password': password,
-        'date': date.toIso8601String(),
+        'userName': userName,
+        'user_password': password,
+        'birthday': date.toIso8601String(),
       };
 
       final response = await http
