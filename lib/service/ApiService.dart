@@ -1,21 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:fitness/models/User.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
   //TODO maybe different services for different tables?
   final String baseUrl = dotenv.get('API_BASE_URL');
   ApiService();
-
-  Future<List<dynamic>> getDepartments() async {
-    final response = await http.get(Uri.parse('$baseUrl/departments'));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    }
-    throw Exception('Failed to load departments');
-  }
 
   Future<List<dynamic>> getUsers() async {
     final response = await http.get(Uri.parse('$baseUrl/app_users'));
@@ -25,115 +22,31 @@ class ApiService {
     throw Exception('Failed to load departments for users');
   }
 
-  Future<dynamic> createDepartment(String name) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/departments'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'name': name}),
+  Future<Map<String, dynamic>> fetchUserProfile(String token) async {
+    print("token just before sending request is : " + token);
+    print("");
+    printCurrentOrigin();
+    final response = await http.get(
+      Uri.parse('$baseUrl/app_users/home'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
     );
 
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body);
-    }
-    throw Exception('Failed to create department');
-  }
-
-  //TODO check this part
-  Future<dynamic> createUser(
-    String name,
-    DateTime date,
-    String password,
-  ) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/app_users'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'user_name': name,
-        'user_password': password,
-        'birthday': date,
-      }),
-    );
-
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body);
-    }
-    throw Exception('Failed to create USER');
-  }
-
-  Future<dynamic> getDepartmentById(int id) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/departments/$id'))
-        .timeout(Duration(seconds: 5)); //what happens if not found?
     if (response.statusCode == 200) {
-      //200 means successfull
+      final responseBody = json.decode(response.body);
+      String name = responseBody["userName"];
+      String birthday = responseBody["birthday"];
 
-      return jsonDecode(response.body);
+      return {'userName': name, 'birthday': birthday};
+    } else {
+      throw Exception('Failed to load profile');
     }
-    throw Exception('Failed to load departments');
-  }
-
-  Future<dynamic> getUserbyId(int id) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/app_users/$id'))
-        .timeout(Duration(seconds: 5)); //what happens if not found?
-    if (response.statusCode == 200) {
-      //200 means successfull
-
-      return jsonDecode(response.body);
-    }
-    throw Exception('Failed to load USER');
-  }
-
-  Future<User> getCurrentUser(String sessionId) async {
-    try {
-      try {
-        final testResponse = await http
-            .get(Uri.parse('$baseUrl/'))
-            .timeout(Duration(seconds: 5));
-        print("Backend reachable: ${testResponse.statusCode}");
-      } catch (e) {
-        print("Cannot reach backend: $e");
-      }
-      final response = await http
-          .get(
-            Uri.parse('$baseUrl/current-user'),
-            headers: {'Session-ID': sessionId}, // Critical: Include session ID
-          )
-          .timeout(const Duration(seconds: 5));
-
-      switch (response.statusCode) {
-        case 200:
-          print("I have successfully reached here");
-          final json = jsonDecode(response.body) as Map<String, dynamic>;
-          return User.fromJson(json);
-
-        default:
-          throw Exception(
-            'Server error=====================================0: ${response.statusCode}',
-          );
-      }
-    } on TimeoutException {
-      throw TimeoutException('Connection timed out');
-    } on http.ClientException {
-      throw Exception('Network error');
-    }
-  }
-
-  Future<dynamic> getUserByName(String name) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/app_users/name/$name'))
-        .timeout(Duration(seconds: 5)); //what happens if not found?
-    if (response.statusCode == 200) {
-      //200 means successfull
-      print("successfully fetched the user");
-      return jsonDecode(response.body);
-    }
-    print("status code === ");
-    print(response.statusCode);
-    throw Exception('Failed to load USER');
   }
 
   Future<String?> validateLogin(String name, String password) async {
+    //this returns the token
     try {
       final credentials = {'userName': name, 'user_password': password};
       final response = await http
@@ -151,6 +64,7 @@ class ApiService {
         final responseBody = json.decode(response.body);
 
         if (responseBody["success"] == true) {
+          await _storage.write(key: 'jwt', value: responseBody["token"]);
           return responseBody["token"];
         } else {
           print("Login failed: success=false");
@@ -208,5 +122,17 @@ class ApiService {
     } catch (e) {
       throw Exception('Failed to register: $e');
     }
+  }
+
+  void printCurrentOrigin() {
+    if (kIsWeb) {
+      // For web, we need to use dart:html but only in web context
+      print('Web app running');
+      // Note: We can't directly use window.location in non-web environments
+    } else {
+      // For mobile/desktop
+      print('Mobile/Desktop app running');
+    }
+    print('App is trying to connect to: http://192.168.1.10:8080');
   }
 }

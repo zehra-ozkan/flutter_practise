@@ -3,6 +3,7 @@ import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
 import 'package:fitness/models/recommendation_model.dart';
 import 'package:fitness/pages/intro_page.dart';
+import 'package:fitness/service/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -16,32 +17,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<CategoryModel> models = [];
   UserRepository? userRepo;
   List<Recommandation> recModels = [];
-  User? user;
-
-  void _getCategories() {
-    models = CategoryModel.getCategories();
-  }
+  String greetName = "";
 
   void _getRecommendations() {
     recModels = Recommandation.getRecommendations();
   }
 
-  Future<void> _getUser() async {
-    // Add 'async'
-    if (userRepo != null && sessionId != null) {
-      user = await userRepo!.getCurrentUser(sessionId!);
-      return;
+  Future<void> _getUserProfile() async {
+    if (userRepo != null) {
+      print("user repo is not null");
+      String? token = await TokenService.getToken();
+      if (token != null) {
+        print("token is not null");
+        var data = await userRepo!.fetchHomeInfo(token!);
+        setState(() {
+          greetName = data["userName"];
+        });
+      } else {
+        print("The token is null");
+      }
     }
-    if (userRepo == null) print("That is not supposed to happen");
-    if (sessionId == null) print("session id is null");
-    print("we are in else");
   }
 
   void _setModels() {
-    _getCategories();
     _getRecommendations();
   }
 
@@ -49,9 +49,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     userRepo = Provider.of<UserRepository>(context, listen: false);
-    _getUser();
+    print("fetched user repo");
 
-    print("user name is ${user?.userName}");
+    _getUserProfile();
+
+    print("user name is $greetName");
     _setModels();
   }
 
@@ -180,107 +182,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    /* ElevatedButton(
-                      /*            style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.amber,
-                            backgroundColor: recModels[index].boxColor,
-                          ), */
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          recModels[index].boxColor,
-                        ),
-                        foregroundColor: MaterialStateProperty.all<Color>(
-                          Colors.white,
-                        ), // White text
-                      ),
-                      onPressed: onPressed({}),
-                      child: Text("View"),
-                    ), */
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Column _categoriesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 20.0,
-          ), //the left blank space for the category
-          child: Text(
-            "Category",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w600, //I am
-            ),
-          ),
-        ),
-        SizedBox(height: 15), // for the space between category and the listview
-        Container(
-          // for the list view
-          height: 120,
-
-          // color: const Color.fromARGB(255, 0, 0, 0),
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: ListView.separated(
-            //
-            scrollDirection: Axis.horizontal,
-            itemCount: models.length,
-            separatorBuilder: (context, index) =>
-                SizedBox(width: 25), //this seperates the boxes from each other
-            itemBuilder: (context, index) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: models[index].boxColor.withOpacity(0.5), //
-                  //below code makes the shadow
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 7,
-                      offset: Offset(8, 8),
-                    ),
-                  ],
-                ),
-
-                width: 100,
-
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      height: 60,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.circular(15),
-                          child: Image(
-                            image: AssetImage(models[index].iconPath),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      models[index].name,
-                      style: TextStyle(
-                        fontSize: 14, //
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ],
                 ),
               );
@@ -358,7 +259,7 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       backgroundColor: const Color.fromARGB(0, 244, 67, 54),
       title: Text(
-        "Hello Whoever You are",
+        "Hello $greetName",
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,

@@ -5,7 +5,6 @@ import 'package:fitness/models/recommendation_model.dart';
 import 'package:fitness/pages/intro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class Posts extends StatefulWidget {
@@ -32,7 +31,7 @@ class _PostsState extends State<Posts> {
   Future<void> _getUser() async {
     // Add 'async'
     if (userRepo != null && sessionId != null) {
-      user = await userRepo!.getCurrentUser(sessionId!);
+      //user = await userRepo!.getCurrentUser(sessionId!);
       return;
     }
     if (userRepo == null) print("That is not supposed to happen");

@@ -1,11 +1,9 @@
 import 'package:fitness/pages/home.dart';
 import 'package:fitness/service/ApiService.dart';
-import 'package:fitness/models/Department.dart';
-import 'package:fitness/models/DepartmentRepository.dart';
 import 'package:fitness/models/UserRepository.dart';
+import 'package:fitness/service/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart'; // The 'as http' part is crucial
 
 String? sessionId; // Store this globally after login
 
@@ -23,7 +21,7 @@ class _IntroPageState extends State<IntroPage> {
   bool hidden = true;
   final userNameField = TextEditingController();
   final passwordField = TextEditingController(); //this is messy
-  String? failMessage = null; //I will set it initially to null
+  String? failMessage; //I will set it initially to null
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,6 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   Column loginField(Icon eyeIcon, BuildContext context) {
-    // Initialize with a default Department instance
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -58,11 +55,15 @@ class _IntroPageState extends State<IntroPage> {
             );
 
             if (token != null) {
+              // await FlutterSessionJwt.saveToken(token);
+              await TokenService.saveToken(token);
               print("wea re valid:");
               print("login successfll");
               Navigator.pushNamed(context, "/homepage");
             } else {
-              print("failed login");
+              print(
+                "failed login",
+              ); //TODO every false is a wrong username or password!
               setState(() {
                 failMessage = "UserName or Password wrong";
               });

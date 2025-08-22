@@ -25,7 +25,9 @@ class UserRepository {
     return a;
   }
 
-  Future<User> getCurrentUser(String sessionId) async {
-    return service.getCurrentUser(sessionId);
+  Future<Map<String, dynamic>> fetchHomeInfo(String token) async {
+    final a = service.fetchUserProfile(token);
+    //TODO maybe I can add checks here
+    return a;
   }
 }

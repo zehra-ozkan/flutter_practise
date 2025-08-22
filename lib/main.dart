@@ -1,7 +1,6 @@
 import 'package:fitness/pages/posts_page.dart';
 import 'package:fitness/pages/profile_page.dart';
 import 'package:fitness/service/ApiService.dart';
-import 'package:fitness/models/DepartmentRepository.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/pages/home.dart';
 import 'package:fitness/pages/intro_page.dart';
@@ -13,7 +12,6 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   final apiService = ApiService();
-  final DepartmentRepository dr = DepartmentRepository(apiService);
   final UserRepository ur = UserRepository(apiService);
 
   /*  runApp(MyApp(departmentRepo: dr, userRepository: ur)); */

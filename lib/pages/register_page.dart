@@ -1,8 +1,7 @@
+import 'package:date_field/date_field.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
-import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key, required this.userRepo});
@@ -55,13 +54,39 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                Padding(
+                /* Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
                   child: a(
                     "Please enter your birthday (dd/mm/yyyy))", //TODO ASSUME THEY ENTER CORRECT
                     Icon(Icons.person_3),
                     dayController,
                     validatePassword,
+                  ),
+                ), */
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 14, right: 14),
+
+                  child: DateTimeFormField(
+                    mode: DateTimeFieldPickerMode.date,
+                    decoration: InputDecoration(
+                      prefix: Icon(Icons.date_range_sharp),
+                      contentPadding: EdgeInsets.all(15),
+                      labelText: "Please enter your birthday",
+                      border: OutlineInputBorder(),
+                    ),
+                    hideDefaultSuffixIcon: true,
+
+                    firstDate: DateTime.now().subtract(
+                      const Duration(days: 365) * 90,
+                    ),
+                    lastDate: DateTime.now().add(const Duration(days: 40)),
+                    /*                     initialPickerDateTime: DateTime.now().add(
+                      const Duration(days: 20),
+                    ), */
+                    //it can also pick time how very cool!!
+                    onChanged: (DateTime? value) {
+                      selectedDate = value;
+                    },
                   ),
                 ),
 
@@ -116,7 +141,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 // 4. Check name availability
 
                 String name = nameController.text;
-                String day = dayController.text;
+                DateTime day = selectedDate!;
+                print(day);
                 String pas1 = pass1Controller.text;
                 String pas2 = pass2Controller.text;
 
@@ -125,8 +151,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 var data = await widget.userRepo.validateRegistration(
                   //the state can access its widget like this
                   name,
-                  "pas1",
-                  date,
+                  pas1,
+                  day,
                 );
 
                 bool valid = data['success'];
@@ -149,7 +175,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  bool _validate = false;
   TextFormField a(
     String txt,
     Icon icon,
@@ -188,6 +213,14 @@ class _RegisterPageState extends State<RegisterPage> {
     if (value.length < 5) {
       return "User Name should contain at least 5 characters!";
     }
+    return null;
+  }
+
+  String? validateDay(String? value) {
+    if (value == null || value.isEmpty) return null;
+    /*     if (value.length < 5) {
+      return "User Name should contain at least 5 characters!";
+    } */
     return null;
   }
 

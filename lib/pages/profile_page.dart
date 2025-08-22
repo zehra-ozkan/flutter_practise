@@ -5,7 +5,6 @@ import 'package:fitness/models/recommendation_model.dart';
 import 'package:fitness/pages/intro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class ProfilePage extends StatefulWidget {
@@ -32,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _getUser() async {
     // Add 'async'
     if (userRepo != null && sessionId != null) {
-      user = await userRepo!.getCurrentUser(sessionId!);
+      //user = await userRepo!.getCurrentUser(sessionId!);
       return;
     }
     if (userRepo == null) print("That is not supposed to happen");
@@ -48,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    userRepo = Provider.of<UserRepository>(context, listen: false);
+    // userRepo = Provider.of<UserRepository>(context, listen: false);
     _getUser();
 
     print("user name is ${user?.userName}");
