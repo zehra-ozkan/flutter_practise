@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:fitness/models/User.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -38,8 +38,10 @@ class ApiService {
       final responseBody = json.decode(response.body);
       String name = responseBody["userName"];
       String birthday = responseBody["birthday"];
+      Uint8List bytes;
+      bytes = base64Decode(responseBody["picture"]);
 
-      return {'userName': name, 'birthday': birthday};
+      return {'userName': name, 'birthday': birthday, 'picture': bytes};
     } else {
       throw Exception('Failed to load profile');
     }

@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   List<Recommandation> recModels = [];
   String greetName = "";
 
+  Widget containerChild = Icon(Icons.person_3_sharp);
+
   void _getRecommendations() {
     recModels = Recommandation.getRecommendations();
   }
@@ -34,6 +36,7 @@ class _HomePageState extends State<HomePage> {
         var data = await userRepo!.fetchHomeInfo(token!);
         setState(() {
           greetName = data["userName"];
+          containerChild = Image.memory(data["picture"]);
         });
       } else {
         print("The token is null");
@@ -303,10 +306,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(10),
             ),
             /* a */
-            child: Icon(
-              Icons.person,
-              size: 24,
-            ), // I can also use flutter's icons
+            child: containerChild, // I can also use flutter's icons
           ),
         ),
       ],
