@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fitness/models/User.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
@@ -36,7 +38,11 @@ class _HomePageState extends State<HomePage> {
         var data = await userRepo!.fetchHomeInfo(token!);
         setState(() {
           greetName = data["userName"];
-          containerChild = Image.memory(data["picture"]);
+          Uint8List? str = data["picture"];
+          if (str != null) {
+            //TODO maybe is empty?
+            containerChild = Image.memory(str);
+          }
         });
       } else {
         print("The token is null");

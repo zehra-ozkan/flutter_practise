@@ -38,8 +38,12 @@ class ApiService {
       final responseBody = json.decode(response.body);
       String name = responseBody["userName"];
       String birthday = responseBody["birthday"];
-      Uint8List bytes;
-      bytes = base64Decode(responseBody["picture"]);
+
+      String str = responseBody["picture"];
+      Uint8List? bytes;
+      if (str != "") {
+        bytes = base64Decode(responseBody["picture"]);
+      }
 
       return {'userName': name, 'birthday': birthday, 'picture': bytes};
     } else {
