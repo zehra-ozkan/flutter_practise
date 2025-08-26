@@ -133,9 +133,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 0),
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/nameUpdate");
+                  },
                   child: Text(
                     _name,
                     style: TextStyle(
@@ -162,12 +164,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/postspage");
+                  },
                   child: Text(
                     _birthday,
                     style: TextStyle(
+                      //TODO borders to text
                       color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.w500, //I am
