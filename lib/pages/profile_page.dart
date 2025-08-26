@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:fitness/models/User.dart';
@@ -59,7 +60,13 @@ class _ProfilePageState extends State<ProfilePage> {
         if (str != null) {
           //TODO maybe is empty?
 
-          containerChild = SizedBox(height: 60, child: Image.memory(str));
+          containerChild = SizedBox(
+            height: 90,
+            child: Image.memory(
+              str,
+              fit: BoxFit.contain, // or BoxFit.cover, BoxFit.fitWidth, etc.
+            ),
+          );
         }
       });
     } else {
@@ -96,7 +103,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _profilePic(),
           TextButton(
             onPressed: () {
-              _pickImage();
+              //_pickImage();
+              _openPicker();
             },
             child: Text(
               "Change Profile Picture",
@@ -197,8 +205,9 @@ class _ProfilePageState extends State<ProfilePage> {
         color: Colors.blue,
         child: SizedBox(
           width: 80,
+          height: 300,
           child: Padding(
-            padding: const EdgeInsets.all(40.0),
+            padding: const EdgeInsets.all(8.0),
             child: containerChild, //profile picture size
           ),
         ),
@@ -417,5 +426,46 @@ class _ProfilePageState extends State<ProfilePage> {
         containerChild = SizedBox(child: Image.file(_image!), height: 350);
       });
     }
+  }
+
+  Future<void> _openPicker() async {
+    print("inside picking object");
+    final _picker = ImagePicker();
+
+    final _pickedImage = await _picker.pickImage(
+      source: ImageSource.gallery,
+    ); //TODO we need pupup for that
+
+    if (_pickedImage != null) {
+      _image = File(_pickedImage.path);
+
+      String? token = await TokenService.getToken();
+      if (token == null) return;
+      await cropImage(_image!.path);
+
+      setState(() {
+        userRepo?.uploadProfileImage(token, _pickedImage!.path);
+        containerChild = SizedBox(child: Image.file(_image!));
+      });
+    }
+  }
+
+  Future<void> cropImage(String path) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: path,
+      aspectRatio: CropAspectRatio(ratioX: 50, ratioY: 50),
+      uiSettings: [
+        AndroidUiSettings(
+          //toolbarTitle: 'Cropper',
+          toolbarColor: const Color.fromARGB(142, 17, 87, 218),
+          toolbarWidgetColor: Colors.white,
+          hideBottomControls: true,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+      ],
+    );
+    setState(() {
+      _image = croppedFile as File;
+    });
   }
 }

@@ -226,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? validatePasswordMatch(String? value, String otherPassword) {
     if (value == null || value.isEmpty) {
-      return "Please repeat your password";
+      // return "Please repeat your password";
     } else if (value != otherPassword) {
       return "Passwords don't match";
     }
