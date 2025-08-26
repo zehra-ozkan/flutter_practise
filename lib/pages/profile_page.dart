@@ -409,7 +409,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _pickImage() async {
+  /*   _pickImage() async {
     print("inside picking object");
     final _picker = ImagePicker();
 
@@ -426,25 +426,22 @@ class _ProfilePageState extends State<ProfilePage> {
         containerChild = SizedBox(child: Image.file(_image!), height: 350);
       });
     }
-  }
+  } */
 
   Future<void> _openPicker() async {
     print("inside picking object");
     final _picker = ImagePicker();
 
-    final _pickedImage = await _picker.pickImage(
-      source: ImageSource.gallery,
-    ); //TODO we need pupup for that
+    final _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
 
     if (_pickedImage != null) {
-      _image = File(_pickedImage.path);
-
       String? token = await TokenService.getToken();
       if (token == null) return;
-      await cropImage(_image!.path);
+      await cropImage(_pickedImage!.path);
 
       setState(() {
-        userRepo?.uploadProfileImage(token, _pickedImage!.path);
+        // _image = File(_pickedImage.path);
+        userRepo?.uploadProfileImage(token, _image!.path);
         containerChild = SizedBox(child: Image.file(_image!));
       });
     }
@@ -454,6 +451,8 @@ class _ProfilePageState extends State<ProfilePage> {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
       aspectRatio: CropAspectRatio(ratioX: 50, ratioY: 50),
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 90,
       uiSettings: [
         AndroidUiSettings(
           //toolbarTitle: 'Cropper',
@@ -465,7 +464,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
     setState(() {
-      _image = croppedFile as File;
+      // _image = croppedFile as File;
+      _image = File(croppedFile!.path);
     });
   }
 }

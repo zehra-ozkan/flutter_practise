@@ -52,9 +52,14 @@ class _IntroPageState extends State<IntroPage> {
           onPressed: () async {
             var password = passwordField.text;
             var userName = userNameField.text;
-            String? token = await widget.userRepo.validateLogin(
+
+            /*             String? token = await widget.userRepo.validateLogin(
               userName,
               password,
+            );   */
+            String? token = await widget.userRepo.validateLogin(
+              "doraemon",
+              "kitty",
             );
 
             if (token != null) {
