@@ -26,6 +26,7 @@ class ApiService {
     print("token just before sending request is : " + token);
     print("");
     printCurrentOrigin();
+
     final response = await http.get(
       Uri.parse('$baseUrl/app_users/home'),
       headers: {
@@ -43,6 +44,8 @@ class ApiService {
       Uint8List? bytes;
       if (str != "") {
         bytes = base64Decode(responseBody["picture"]);
+      } else {
+        bytes = null;
       }
 
       return {'userName': name, 'birthday': birthday, 'picture': bytes};
@@ -53,6 +56,7 @@ class ApiService {
 
   Future<String?> validateLogin(String name, String password) async {
     //this returns the token
+    printCurrentOrigin();
     try {
       final credentials = {'userName': name, 'user_password': password};
       final response = await http
@@ -127,6 +131,31 @@ class ApiService {
       throw Exception('Request timed out. Check server or network.');
     } catch (e) {
       throw Exception('Failed to register: $e');
+    }
+  }
+
+  Future<void> uploadProfileImage(String token, String path) async {
+    print("token just before sending request is : $token");
+    print("");
+
+    try {
+      final uri = Uri.parse("$baseUrl/user_profiles/updatePic");
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      var pic = await http.MultipartFile.fromPath("file", path);
+      request.files.add(pic);
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("Image uploaded");
+      } else {
+        print("Image not uploaded");
+      }
+    } catch (e) {
+      print("Error uploading image: $e");
     }
   }
 

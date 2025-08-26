@@ -1,10 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:fitness/models/User.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/models/category_models.dart';
 import 'package:fitness/models/recommendation_model.dart';
 import 'package:fitness/pages/intro_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/service/token_service.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class ProfilePage extends StatefulWidget {
@@ -17,26 +24,47 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   List<CategoryModel> models = [];
   UserRepository? userRepo;
-  List<Recommandation> recModels = [];
-  User? user;
+  final ImagePicker _picker = ImagePicker();
+  File? _image; //this will be used to change the profile picture
 
-  void _getCategories() {
-    models = CategoryModel.getCategories();
-  }
+  List<Recommandation> recModels = [];
+  User? _user;
+  String _name = "Whoever you are";
+  String _birthday = "Whenever that is";
+
+  Widget containerChild = Icon(Icons.person_3_sharp);
 
   void _getRecommendations() {
     recModels = Recommandation.getRecommendations();
   }
 
+  void _getCategories() {
+    models = CategoryModel.getCategories();
+  }
+
   Future<void> _getUser() async {
-    // Add 'async'
-    if (userRepo != null && sessionId != null) {
-      //user = await userRepo!.getCurrentUser(sessionId!);
-      return;
+    if (userRepo == null) return;
+    print("user repo is not null");
+
+    String? token = await TokenService.getToken();
+    if (token != null) {
+      print("token is not null");
+      var data = await userRepo!.fetchHomeInfo(token!);
+      setState(() {
+        String name1 = data["userName"];
+        String birthday1 = data["birthday"];
+        Uint8List? str = data["picture"];
+        _name = name1;
+        _birthday = birthday1;
+        if (str != null) {
+          //TODO maybe is empty?
+
+          containerChild = SizedBox(height: 60, child: Image.memory(str));
+        }
+      });
+    } else {
+      print("The token is null");
     }
-    if (userRepo == null) print("That is not supposed to happen");
-    if (sessionId == null) print("session id is null");
-    print("we are in else");
   }
 
   void _setModels() {
@@ -47,11 +75,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    // userRepo = Provider.of<UserRepository>(context, listen: false);
+    userRepo = Provider.of<UserRepository>(context, listen: false);
     _getUser();
-
-    print("user name is ${user?.userName}");
-    _setModels();
+    _setModels(); //these are for friends and for user posts
   }
 
   @override
@@ -64,13 +90,27 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: appBar(context),
       backgroundColor: const Color.fromARGB(255, 217, 222, 231),
       body: ListView(
-        //crossAxisAlignment: CrossAxisAlignment.center,
+        //listview is for the scrollvar
         scrollDirection: Axis.vertical,
         children: [
           _profilePic(),
+          TextButton(
+            onPressed: () {
+              _pickImage();
+            },
+            child: Text(
+              "Change Profile Picture",
+              style: TextStyle(
+                color: const Color.fromARGB(255, 18, 54, 153),
+                fontSize: 18,
+                fontWeight: FontWeight.w300, //I am
+              ),
+            ),
+          ),
           SizedBox(
             height: 20,
           ), //this is to seperate the search bar form the category text
+
           Row(
             children: [
               Padding(
@@ -89,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: TextButton(
                   onPressed: () {},
                   child: Text(
-                    "whoever you are",
+                    _name,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -118,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: TextButton(
                   onPressed: () {},
                   child: Text(
-                    "whenever that is",
+                    _birthday,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -157,13 +197,9 @@ class _ProfilePageState extends State<ProfilePage> {
         color: Colors.blue,
         child: SizedBox(
           width: 80,
-          /*         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            color: Colors.greenAccent,
-          ), */
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(Icons.person_3_sharp, size: 80), //profile picture size
+            padding: const EdgeInsets.all(40.0),
+            child: containerChild, //profile picture size
           ),
         ),
       ),
@@ -340,69 +376,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Container _searchField() {
-    return Container(
-      //this is the search bar
-      margin: EdgeInsets.only(top: 40, left: 20, right: 20),
-      child: TextField(
-        //we cannot add margin to the text field so we will wrap it inside a container and add margin to the container
-        decoration: InputDecoration(
-          // this is here
-          filled: true,
-          fillColor: Colors.white,
-          hintText: "Search Friends",
-          hintStyle: TextStyle(
-            color: const Color.fromARGB(255, 195, 195, 195),
-            fontSize: 14,
-          ),
-          contentPadding: EdgeInsets.all(
-            15,
-          ), //the height of the searchbar the padding of the text inside the searchbar
-          prefixIcon: Icon(
-            Icons.search_outlined,
-            size: 32,
-          ), //this is the icon in the beginning
-
-          suffixIcon: Container(
-            width:
-                100, //without the with it takes up all the search bar to fix that a fixed size of the container is assigned
-            //color: Colors.purple,
-            child: IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-
-                children: [
-                  VerticalDivider(
-                    color: Colors.black,
-                    thickness: 0.5,
-                    indent:
-                        10, //indent leaves space in the beginning and in the end of the vertical var
-                    endIndent: 10,
-                  ), //the bar by the left of the filter icon
-                  Padding(
-                    //wrap it inside padding to make the icon smaller
-                    padding: const EdgeInsets.all(8.0),
-                    child: SvgPicture.asset(
-                      'assets/icons/filter_icon.svg',
-                      height: 32,
-                      width: 32,
-                      color: const Color.fromARGB(255, 88, 88, 88),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          border: OutlineInputBorder(
-            borderSide: BorderSide.none, //removes the border in the search bar
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
-    );
-  }
-
   AppBar appBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
@@ -425,5 +398,24 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  _pickImage() async {
+    print("inside picking object");
+    final _picker = ImagePicker();
+
+    final _pickedImage = await _picker.pickImage(
+      source: ImageSource.gallery,
+    ); //TODO we need pupup for that
+
+    if (_pickedImage != null) {
+      _image = File(_pickedImage.path);
+      String? token = await TokenService.getToken();
+      if (token == null) return;
+      userRepo?.uploadProfileImage(token, _image!.path);
+      setState(() {
+        containerChild = SizedBox(child: Image.file(_image!), height: 350);
+      });
+    }
   }
 }

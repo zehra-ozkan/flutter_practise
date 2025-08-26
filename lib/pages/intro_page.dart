@@ -32,7 +32,10 @@ class _IntroPageState extends State<IntroPage> {
     var eyeIcon = hidden ? hiddenOff : visible;
 
     return Scaffold(
-      appBar: AppBar(title: Text("this is the app var")),
+      appBar: AppBar(
+        title: Text("this is the app var"),
+        leading: Icon(Icons.girl),
+      ),
       body: loginField(eyeIcon, context),
     );
   }

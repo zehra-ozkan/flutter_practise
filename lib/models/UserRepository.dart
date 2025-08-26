@@ -30,4 +30,9 @@ class UserRepository {
     //TODO maybe I can add checks here
     return a;
   }
+
+  Future<void> uploadProfileImage(String token, String path) async {
+    service.uploadProfileImage(token, path);
+    return;
+  }
 }

@@ -1,10 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:fitness/models/User.dart';
 import 'package:fitness/models/UserRepository.dart';
-import 'package:fitness/models/category_models.dart';
 import 'package:fitness/models/recommendation_model.dart';
-import 'package:fitness/pages/intro_page.dart';
 import 'package:fitness/service/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,23 +27,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _getUserProfile() async {
-    if (userRepo != null) {
-      print("user repo is not null");
-      String? token = await TokenService.getToken();
-      if (token != null) {
-        print("token is not null");
-        var data = await userRepo!.fetchHomeInfo(token!);
-        setState(() {
-          greetName = data["userName"];
-          Uint8List? str = data["picture"];
-          if (str != null) {
-            //TODO maybe is empty?
-            containerChild = Image.memory(str);
-          }
-        });
-      } else {
-        print("The token is null");
-      }
+    if (userRepo == null) return;
+    print("user repo is not null");
+    String? token = await TokenService.getToken();
+    if (token != null) {
+      print("token is not null");
+      var data = await userRepo!.fetchHomeInfo(token!);
+      setState(() {
+        greetName = data["userName"];
+        Uint8List? str = data["picture"];
+        if (str != null) {
+          //TODO maybe is empty?
+          containerChild = Image.memory(str);
+        }
+      });
+    } else {
+      print("The token is null");
     }
   }
 
