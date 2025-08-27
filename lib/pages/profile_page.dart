@@ -383,9 +383,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       height: 60,
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(10.0),
 
                         child: getProfile(friendModels[index].image),
+                        //child: profileWidget(),
                       ),
                     ),
                     Text(
@@ -406,12 +407,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget getProfile(String str) {
-    Uint8List? bytes;
-    if (str != "") {
-      bytes = base64Decode(str);
-    }
+    return StreamBuilder<String>(
+      stream: Stream.value(str), // Force rebuild with new value
+      builder: (context, snapshot) {
+        if (str.isEmpty) return Icon(Icons.person);
 
-    return str == "" ? Icon(Icons.person) : Image.memory(bytes!);
+        try {
+          final bytes = base64Decode(str);
+          return Image.memory(bytes);
+        } catch (e) {
+          return Icon(Icons.error);
+        }
+      },
+    );
   }
 
   AppBar appBar(BuildContext context) {
@@ -496,5 +504,14 @@ class _ProfilePageState extends State<ProfilePage> {
       // _image = croppedFile as File;
       _image = File(croppedFile!.path);
     });
+  }
+}
+
+class profileWidget extends StatelessWidget {
+  const profileWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(Icons.person);
   }
 }
