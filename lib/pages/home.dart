@@ -308,7 +308,9 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(10),
             ),
             /* a */
-            child: containerChild, // I can also use flutter's icons
+            child: ClipOval(
+              child: containerChild,
+            ), // I can also use flutter's icons
           ),
         ),
       ],

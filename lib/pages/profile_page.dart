@@ -25,7 +25,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  List<CategoryModel> models = [];
   List<Friend> friendModels = [];
   UserRepository? userRepo;
   final ImagePicker _picker = ImagePicker();
@@ -41,10 +40,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _getRecommendations() {
     recModels = Recommandation.getRecommendations();
-  }
-
-  void _getCategories() {
-    models = CategoryModel.getCategories();
   }
 
   Future<void> _getFriends() async {
@@ -71,15 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _name = name1;
         _birthday = birthday1;
         if (str != null) {
-          //TODO maybe is empty?
-
-          containerChild = SizedBox(
-            height: 90,
-            child: Image.memory(
-              str,
-              fit: BoxFit.contain, // or BoxFit.cover, BoxFit.fitWidth, etc.
-            ),
-          );
+          containerChild = Image.memory(str);
         }
       });
     } else {
@@ -89,7 +76,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _setModels() {
     _getFriends();
-    _getCategories();
     _getRecommendations();
   }
 
@@ -103,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    _setModels();
+    //_setModels();
 
     return Scaffold(
       resizeToAvoidBottomInset:
@@ -220,15 +206,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Container _profilePic() {
     //TODO fix the circle
     return Container(
-      child: ColoredBox(
-        color: Colors.blue,
-        child: SizedBox(
-          width: 80,
-          height: 300,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: containerChild, //profile picture size
-          ),
+      // color: Colors.blue,
+      child: SizedBox(
+        //width: 80,
+        height: 340,
+        child: ClipOval(
+          //padding: const EdgeInsets.all(8.0),
+          child: containerChild, //profile picture size
         ),
       ),
     );
@@ -382,11 +366,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.white,
                       ),
                       height: 60,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-
+                      child: ClipOval(
+                        // padding: const EdgeInsets.all(10.0),
                         child: getProfile(friendModels[index].image),
-                        //child: profileWidget(),
+                        //child: ProfileWidget(str: friendModels[index].image),
                       ),
                     ),
                     Text(
@@ -406,20 +389,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget getProfile(String str) {
-    return StreamBuilder<String>(
-      stream: Stream.value(str), // Force rebuild with new value
-      builder: (context, snapshot) {
-        if (str.isEmpty) return Icon(Icons.person);
-
-        try {
-          final bytes = base64Decode(str);
-          return Image.memory(bytes);
-        } catch (e) {
-          return Icon(Icons.error);
-        }
-      },
-    );
+  Widget getProfile(Uint8List? str) {
+    return str == null ? Icon(Icons.person) : Image.memory(str!);
   }
 
   AppBar appBar(BuildContext context) {
@@ -439,31 +410,11 @@ class _ProfilePageState extends State<ProfilePage> {
             color: Color.fromARGB(255, 207, 221, 246), //I like this color
             borderRadius: BorderRadius.circular(10),
           ),
-          //child: SvgPicture.asset("assets/icons/back-svgrepo-com.svg"),
           child: Icon(Icons.home, size: 24), // I can also use flutter's icons
         ),
       ),
     );
   }
-
-  /*   _pickImage() async {
-    print("inside picking object");
-    final _picker = ImagePicker();
-
-    final _pickedImage = await _picker.pickImage(
-      source: ImageSource.gallery,
-    ); //TODO we need pupup for that
-
-    if (_pickedImage != null) {
-      _image = File(_pickedImage.path);
-      String? token = await TokenService.getToken();
-      if (token == null) return;
-      userRepo?.uploadProfileImage(token, _image!.path);
-      setState(() {
-        containerChild = SizedBox(child: Image.file(_image!), height: 350);
-      });
-    }
-  } */
 
   Future<void> _openPicker() async {
     print("inside picking object");
@@ -477,7 +428,6 @@ class _ProfilePageState extends State<ProfilePage> {
       await cropImage(_pickedImage!.path);
 
       setState(() {
-        // _image = File(_pickedImage.path);
         userRepo?.uploadProfileImage(token, _image!.path);
         containerChild = SizedBox(child: Image.file(_image!));
       });
@@ -492,7 +442,6 @@ class _ProfilePageState extends State<ProfilePage> {
       compressQuality: 90,
       uiSettings: [
         AndroidUiSettings(
-          //toolbarTitle: 'Cropper',
           toolbarColor: const Color.fromARGB(142, 17, 87, 218),
           toolbarWidgetColor: Colors.white,
           hideBottomControls: true,
@@ -501,17 +450,28 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
     setState(() {
-      // _image = croppedFile as File;
       _image = File(croppedFile!.path);
     });
   }
 }
 
-class profileWidget extends StatelessWidget {
-  const profileWidget({super.key});
+/* 
+class ProfileWidget extends StatefulWidget {
+  final String str;
+
+  const ProfileWidget({Key? key, required this.str}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Icon(Icons.person);
-  }
+  State<ProfileWidget> createState() => _ProfileWidgetState();
 }
+
+class _ProfileWidgetState extends State<ProfileWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Uint8List? bytes;
+    if (str != "") {
+      bytes = base64Decode(str);
+    }
+
+    return str == "" ? Icon(Icons.person) : Image.memory(bytes!);
+  } */
