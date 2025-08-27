@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:fitness/models/User.dart';
+import 'package:fitness/models/friends_model.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +11,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiService {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  //TODO maybe different services for different tables?
   final String baseUrl = dotenv.get('API_BASE_URL');
   ApiService();
 
@@ -25,7 +25,7 @@ class ApiService {
   Future<Map<String, dynamic>> fetchUserProfile(String token) async {
     print("token just before sending request is : " + token);
     print("");
-    printCurrentOrigin();
+    _printCurrentOrigin();
 
     final response = await http.get(
       Uri.parse('$baseUrl/app_users/home'),
@@ -43,7 +43,7 @@ class ApiService {
       String str = responseBody["picture"];
       Uint8List? bytes;
       if (str != "") {
-        bytes = base64Decode(responseBody["picture"]);
+        bytes = base64Decode(str);
       } else {
         bytes = null;
       }
@@ -56,7 +56,7 @@ class ApiService {
 
   Future<String?> validateLogin(String name, String password) async {
     //this returns the token
-    printCurrentOrigin();
+    _printCurrentOrigin();
     try {
       final credentials = {'userName': name, 'user_password': password};
       final response = await http
@@ -159,7 +159,31 @@ class ApiService {
     }
   }
 
-  void printCurrentOrigin() {
+  Future<Map<String, dynamic>> getUserFriends(String token) async {
+    _printCurrentOrigin();
+    print("token just before sending request is : " + token);
+    print("");
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/app_users/friends/top'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      int count = responseBody["count"];
+
+      List<dynamic> bb = responseBody["friends"];
+      return {'count': count, 'friends': bb};
+    } else {
+      throw Exception('Failed to load user friends');
+    }
+  }
+
+  void _printCurrentOrigin() {
     if (kIsWeb) {
       // For web, we need to use dart:html but only in web context
       print('Web app running');

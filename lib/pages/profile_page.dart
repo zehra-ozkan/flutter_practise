@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:fitness/models/friends_model.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -24,6 +26,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   List<CategoryModel> models = [];
+  List<Friend> friendModels = [];
   UserRepository? userRepo;
   final ImagePicker _picker = ImagePicker();
   File? _image; //this will be used to change the profile picture
@@ -34,6 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _birthday = "Whenever that is";
 
   Widget containerChild = Icon(Icons.person_3_sharp);
+  Widget friendContainer = Icon(Icons.person_3_sharp);
 
   void _getRecommendations() {
     recModels = Recommandation.getRecommendations();
@@ -41,6 +45,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _getCategories() {
     models = CategoryModel.getCategories();
+  }
+
+  Future<void> _getFriends() async {
+    if (userRepo == null) return;
+    String? token = await TokenService.getToken();
+    if (token == null) return;
+    var data = await userRepo!.getUserFriends(token);
+    List<dynamic> bb = data["friends"];
+    friendModels = bb.map((json) => Friend.fromJson(json)).toList();
   }
 
   Future<void> _getUser() async {
@@ -75,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _setModels() {
+    _getFriends();
     _getCategories();
     _getRecommendations();
   }
@@ -346,7 +360,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: ListView.separated(
             //
             scrollDirection: Axis.horizontal,
-            itemCount: models.length,
+
+            itemCount: friendModels.length,
             separatorBuilder: (context, index) =>
                 SizedBox(width: 5), //this seperates the boxes from each other
             itemBuilder: (context, index) {
@@ -370,11 +385,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
 
-                        child: Icon(Icons.person),
+                        child: getProfile(friendModels[index].image),
                       ),
                     ),
                     Text(
-                      models[index].name,
+                      friendModels[index].name,
                       style: TextStyle(
                         fontSize: 14, //
                         fontWeight: FontWeight.w600,
@@ -388,6 +403,15 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ],
     );
+  }
+
+  Widget getProfile(String str) {
+    Uint8List? bytes;
+    if (str != "") {
+      bytes = base64Decode(str);
+    }
+
+    return str == "" ? Icon(Icons.person) : Image.memory(bytes!);
   }
 
   AppBar appBar(BuildContext context) {

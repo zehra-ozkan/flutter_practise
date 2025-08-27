@@ -58,7 +58,7 @@ class _IntroPageState extends State<IntroPage> {
               password,
             );   */
             String? token = await widget.userRepo.validateLogin(
-              "doraemon",
+              "kitty",
               "kitty",
             );
 

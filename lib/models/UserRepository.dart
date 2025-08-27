@@ -35,4 +35,9 @@ class UserRepository {
     service.uploadProfileImage(token, path);
     return;
   }
+
+  Future<Map<String, dynamic>> getUserFriends(String token) async {
+    final a = service.getUserFriends(token);
+    return a;
+  }
 }
