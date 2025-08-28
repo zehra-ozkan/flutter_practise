@@ -45,4 +45,8 @@ class UserRepository {
     final a = service.getUserPosts(token);
     return a;
   }
+
+  Future<void> uploadPost(String token, String path, String text) async {
+    final a = service.addNewPost(token, path, text);
+  }
 }

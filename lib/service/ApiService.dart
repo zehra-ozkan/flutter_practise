@@ -14,14 +14,6 @@ class ApiService {
   final String baseUrl = dotenv.get('API_BASE_URL');
   ApiService();
 
-  Future<List<dynamic>> getUsers() async {
-    final response = await http.get(Uri.parse('$baseUrl/app_users'));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    }
-    throw Exception('Failed to load departments for users');
-  }
-
   Future<Map<String, dynamic>> fetchUserProfile(String token) async {
     print("token just before sending request is : " + token);
     print("");
@@ -216,6 +208,34 @@ class ApiService {
       return {'count': count, 'posts': bb};
     } else {
       throw Exception('Failed to load user friends');
+    }
+  }
+
+  addNewPost(String token, String path, String text) async {
+    try {
+      final uri = Uri.parse("$baseUrl/posts/new_post");
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      var pic = await http.MultipartFile.fromPath("file", path);
+      request.files.add(pic);
+      request.fields["postText"] = text;
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        //final responseBody = json.decode(response.body);
+        return {'success': true};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'userId': -1};
+      } else {
+        throw Exception('HTTP Error: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Check server or network.');
+    } catch (e) {
+      throw Exception('Failed to register: $e');
     }
   }
 }

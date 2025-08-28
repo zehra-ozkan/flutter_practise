@@ -92,6 +92,27 @@ class _HomePageState extends State<HomePage> {
               child: Text("See All Posts"),
             ),
           ),
+
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, "/newpost");
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              margin: EdgeInsets.all(10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 122, 135, 157), //I like this color
+                borderRadius: BorderRadius.circular(10),
+              ),
+              //child: SvgPicture.asset("assets/icons/back-svgrepo-com.svg"),
+              child: Icon(
+                Icons.post_add,
+                size: 24,
+              ), // I can also use flutter's icons
+            ),
+          ),
         ],
       ),
       //backgroundColor: Colors.white,

@@ -1,3 +1,4 @@
+import 'package:fitness/pages/newpost.dart';
 import 'package:fitness/pages/posts_page.dart';
 import 'package:fitness/pages/profile_page.dart';
 import 'package:fitness/pages/updateName.dart';
@@ -41,7 +42,8 @@ class MyApp extends StatelessWidget {
         '/postspage': (context) => Posts(), //I will make it an invalid userId
         '/intropage': (context) => IntroPage(userRepo: userRepo),
         '/registerpage': (context) => RegisterPage(userRepo: userRepo),
-        'nameUpdate': (context) => NameUpdate(),
+        '/nameUpdate': (context) => NameUpdate(),
+        '/newpost': (context) => NewPost(),
       },
     );
   }
