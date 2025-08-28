@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:fitness/models/friends_model.dart';
+import 'package:fitness/models/posts_model.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -29,8 +30,9 @@ class _ProfilePageState extends State<ProfilePage> {
   UserRepository? userRepo;
   final ImagePicker _picker = ImagePicker();
   File? _image; //this will be used to change the profile picture
-
+  List<Post> postModels = [];
   List<Recommandation> recModels = [];
+
   User? _user;
   String _name = "Whoever you are";
   String _birthday = "Whenever that is";
@@ -49,6 +51,15 @@ class _ProfilePageState extends State<ProfilePage> {
     var data = await userRepo!.getUserFriends(token);
     List<dynamic> bb = data["friends"];
     friendModels = bb.map((json) => Friend.fromJson(json)).toList();
+  }
+
+  Future<void> _getPosts() async {
+    if (userRepo == null) return;
+    String? token = await TokenService.getToken();
+    if (token == null) return;
+    var data = await userRepo!.getUserPosts(token);
+    List<dynamic> bb = data["posts"];
+    postModels = bb.map((json) => Post.fromJson(json)).toList();
   }
 
   Future<void> _getUser() async {
@@ -76,6 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _setModels() {
     _getFriends();
+    _getPosts();
     _getRecommendations();
   }
 
@@ -240,12 +252,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: recModels.length,
+            itemCount: postModels.length,
             separatorBuilder: (context, index) => SizedBox(width: 25),
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  color: recModels[index].boxColor.withOpacity(0.5),
+                  color: Colors.deepOrange,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -259,51 +271,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 180,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                      child: Image(
-                        image: AssetImage(recModels[index].iconPath),
-                        height: 80,
-                      ),
+                      child: Image.memory(postModels[index].postImage),
                     ),
-                    Row(
+                    Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(25),
-                              ),
-                              color: Colors.amber,
-                            ),
-                            child: Icon(Icons.person_3_sharp),
+                        Text(
+                          postModels[index].postUserName,
+                          style: TextStyle(
+                            fontSize: 14, //
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Column(
-                          children: [
-                            Text(
-                              recModels[index].name,
-                              style: TextStyle(
-                                fontSize: 14, //
-                                fontWeight: FontWeight.w600,
-                              ),
+                        SizedBox(height: 5),
+                        SizedBox(
+                          width: 45,
+                          child: Text(
+                            postModels[index].text,
+                            style: TextStyle(
+                              fontSize: 12, //
+                              fontWeight: FontWeight.w400,
+                              //  color: const Color.fromARGB(255, 101, 101, 101),
                             ),
-                            SizedBox(height: 5),
-                            SizedBox(
-                              width: 45,
-                              child: Text(
-                                "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
-                                style: TextStyle(
-                                  fontSize: 12, //
-                                  fontWeight: FontWeight.w400,
-                                  //  color: const Color.fromARGB(255, 101, 101, 101),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -454,24 +446,3 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 }
-
-/* 
-class ProfileWidget extends StatefulWidget {
-  final String str;
-
-  const ProfileWidget({Key? key, required this.str}) : super(key: key);
-
-  @override
-  State<ProfileWidget> createState() => _ProfileWidgetState();
-}
-
-class _ProfileWidgetState extends State<ProfileWidget> {
-  @override
-  Widget build(BuildContext context) {
-    Uint8List? bytes;
-    if (str != "") {
-      bytes = base64Decode(str);
-    }
-
-    return str == "" ? Icon(Icons.person) : Image.memory(bytes!);
-  } */

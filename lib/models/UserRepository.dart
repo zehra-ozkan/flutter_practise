@@ -40,4 +40,9 @@ class UserRepository {
     final a = service.getUserFriends(token);
     return a;
   }
+
+  Future<Map<String, dynamic>> getUserPosts(String token) async {
+    final a = service.getUserPosts(token);
+    return a;
+  }
 }

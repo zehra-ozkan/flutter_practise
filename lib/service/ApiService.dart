@@ -194,4 +194,28 @@ class ApiService {
     }
     print('App is trying to connect to: http://192.168.1.10:8080');
   }
+
+  Future<Map<String, dynamic>> getUserPosts(String token) async {
+    _printCurrentOrigin();
+    print("token just before sending MY POSTS request is : " + token);
+    print("");
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/my_posts'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      int count = responseBody["count"];
+
+      List<dynamic> bb = responseBody["posts"];
+      return {'count': count, 'posts': bb};
+    } else {
+      throw Exception('Failed to load user friends');
+    }
+  }
 }
