@@ -31,7 +31,7 @@ class ApiService {
       final responseBody = json.decode(response.body);
       String name = responseBody["userName"];
       String birthday = responseBody["birthday"];
-
+      int id = responseBody["userId"];
       String str = responseBody["picture"];
       Uint8List? bytes;
       if (str != "") {
@@ -40,7 +40,12 @@ class ApiService {
         bytes = null;
       }
 
-      return {'userName': name, 'birthday': birthday, 'picture': bytes};
+      return {
+        'userName': name,
+        'birthday': birthday,
+        'picture': bytes,
+        "userId": id,
+      };
     } else {
       throw Exception('Failed to load profile');
     }

@@ -1,0 +1,175 @@
+import 'dart:io';
+
+import 'package:fitness/pages/home.dart';
+import 'package:fitness/service/ApiService.dart';
+import 'package:fitness/models/UserRepository.dart';
+import 'package:fitness/service/token_service.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+String? sessionId; // Store this globally after login
+
+class Qrpage extends StatefulWidget {
+  //final DepartmentRepository depRepo; // Store as a field
+
+  const Qrpage({super.key});
+  //bool hidden = true;
+  @override
+  State<Qrpage> createState() => _QrpageState();
+}
+
+class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
+  Widget containerChild = Icon(Icons.person_3_sharp);
+  UserRepository? userRepo;
+  int? userId;
+
+  late final TabController _tabController;
+  TextEditingController textController = TextEditingController();
+
+  final MobileScannerController controller = MobileScannerController(
+    detectionSpeed: DetectionSpeed.normal,
+
+    detectionTimeoutMs: 250,
+    torchEnabled: true,
+    invertImage: true,
+    autoZoom: true,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    userRepo = Provider.of<UserRepository>(context, listen: false);
+    _getUserProfile();
+  }
+
+  Future<void> _getUserProfile() async {
+    if (userRepo == null) return;
+    print("user repo is not null");
+    String? token = await TokenService.getToken();
+    if (token != null) {
+      print("token is not null");
+      var data = await userRepo!.fetchHomeInfo(token!);
+      setState(() {
+        userId = data["userId"];
+      });
+    } else {
+      print("The token is null");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: appBar(),
+      body: TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          Center(child: oldColumn()),
+          Center(child: _scanner()),
+        ],
+      ),
+    );
+  }
+
+  Column oldColumn() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _profilePic(), //bir şeyler
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            "Your QR is private. If you share it with someone, they can scan it with their App camera to add you as a contact.",
+            style: TextStyle(
+              fontSize: 12,
+              color: const Color.fromARGB(255, 0, 0, 0),
+              fontWeight: FontWeight.w500, //I am
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Container _scanner() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 207, 221, 246), //I like this color
+        borderRadius: BorderRadius.circular(20),
+      ),
+      width: 250,
+      height: 250,
+      alignment: Alignment.center,
+      child: MobileScanner(
+        onDetect: (result) {
+          print(result.barcodes.first.rawValue);
+        },
+      ),
+    );
+  }
+
+  AppBar appBar() {
+    return AppBar(
+      title: Text(
+        "QR code",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500, //I am
+        ),
+      ),
+      backgroundColor: Colors.black,
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, "/profilepage");
+        },
+        child: Container(
+          margin: EdgeInsets.all(15),
+          alignment: Alignment.center,
+
+          child: Icon(Icons.arrow_back, size: 28, color: Colors.white),
+        ),
+      ),
+
+      bottom: TabBar(
+        controller: _tabController,
+        tabs: <Widget>[
+          Tab(text: "My Code"),
+          Tab(text: "Scan Code"),
+        ],
+      ),
+    );
+  }
+
+  Container _profilePic() {
+    //TODO fix the circle
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 207, 221, 246), //I like this color
+        borderRadius: BorderRadius.circular(20),
+      ),
+      width: 250,
+      height: 250,
+      alignment: Alignment.center,
+
+      margin: EdgeInsets.only(top: 40),
+      // alignment: Alignment.center,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: QrImageView(data: userId.toString(), version: QrVersions.auto),
+      ), //profile picture size
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}

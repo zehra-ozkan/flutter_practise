@@ -33,7 +33,6 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Post> postModels = [];
   List<Recommandation> recModels = [];
 
-  User? _user;
   String _name = "Whoever you are";
   String _birthday = "Whenever that is";
 
@@ -113,6 +112,23 @@ class _ProfilePageState extends State<ProfilePage> {
         scrollDirection: Axis.vertical,
         children: [
           _profilePic(),
+          Container(
+            margin: EdgeInsets.all(10),
+            alignment: Alignment.bottomRight,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 207, 221, 246), //I like this color
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, "/qrPage");
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.qr_code_2_rounded, size: 28),
+              ), // I can also use flutter's icons
+            ),
+          ),
           TextButton(
             onPressed: () {
               //_pickImage();
@@ -286,15 +302,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         SizedBox(height: 5),
-                        SizedBox(
-                          width: 45,
-                          child: Text(
-                            postModels[index].text,
-                            style: TextStyle(
-                              fontSize: 12, //
-                              fontWeight: FontWeight.w400,
-                              //  color: const Color.fromARGB(255, 101, 101, 101),
-                            ),
+
+                        Text(
+                          postModels[index].text,
+                          style: TextStyle(
+                            fontSize: 12, //
+                            fontWeight: FontWeight.w400,
+                            //  color: const Color.fromARGB(255, 101, 101, 101),
                           ),
                         ),
                       ],

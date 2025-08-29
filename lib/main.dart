@@ -1,6 +1,7 @@
 import 'package:fitness/pages/newpost.dart';
 import 'package:fitness/pages/posts_page.dart';
 import 'package:fitness/pages/profile_page.dart';
+import 'package:fitness/pages/qrPage.dart';
 import 'package:fitness/pages/updateName.dart';
 import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/UserRepository.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/registerpage': (context) => RegisterPage(userRepo: userRepo),
         '/nameUpdate': (context) => NameUpdate(),
         '/newpost': (context) => NewPost(),
+        '/qrPage': (context) => Qrpage(),
       },
     );
   }

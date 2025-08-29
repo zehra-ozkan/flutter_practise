@@ -25,6 +25,7 @@ class _NewPostState extends State<NewPost> {
   final userNameField = TextEditingController();
   Widget containerChild = Icon(Icons.person_3_sharp);
   UserRepository? userRepo;
+  String? nameError;
   File? _image; //this will be used to change the profile picture
 
   TextEditingController textController = TextEditingController();
@@ -42,6 +43,12 @@ class _NewPostState extends State<NewPost> {
       body: Column(
         children: [
           _profilePic(), //
+          if (nameError != null) //this will appear after the button is clicked
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+
+              child: Text(nameError!, style: TextStyle(color: Colors.red)),
+            ),
           b(),
         ],
       ),
@@ -80,6 +87,15 @@ class _NewPostState extends State<NewPost> {
       actions: [
         GestureDetector(
           onTap: () async {
+            setState(() {
+              nameError = null;
+            });
+
+            if (_image == null) {
+              nameError = "Please select a photo for your post";
+              return;
+            }
+
             print("\nrah rah rah \n");
             await _uploadNewPost();
             print("\nrah rah rah \n");
