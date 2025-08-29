@@ -247,7 +247,7 @@ class ApiService {
   Future<Map<String, dynamic>> addFriend(String token, int k) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/friends/add'),
+        Uri.parse('$baseUrl/app_users/friends/add'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

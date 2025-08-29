@@ -205,7 +205,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
     if (token == null || userRepo == null || k == userId) return;
 
     print("calling the datavase");
-    var data = await userRepo?.addFriend(token, k);
+    var data = await userRepo!.addFriend(token, k);
 
     print("you are now friends with someone");
     setState(() {
