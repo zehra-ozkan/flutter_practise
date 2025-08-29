@@ -6,6 +6,8 @@ import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/service/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:popover/popover.dart';
+
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -35,7 +37,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   TextEditingController textController = TextEditingController();
 
   final MobileScannerController controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.normal,
+    detectionSpeed: DetectionSpeed.noDuplicates,
 
     detectionTimeoutMs: 250,
     torchEnabled: true,
@@ -76,7 +78,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
         controller: _tabController,
         children: <Widget>[
           Center(child: oldColumn()),
-          Center(child: _scanner()),
+          Center(child: _scanner(context)),
         ],
       ),
     );
@@ -103,7 +105,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
     );
   }
 
-  Column _scanner() {
+  Column _scanner(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -118,9 +120,35 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
           alignment: Alignment.center,
 
           child: MobileScanner(
-            onDetect: (result) {
+            onDetect: (result) async {
               print(result.barcodes.first.rawValue);
-              _handleScan(result.barcodes.first.rawValue);
+              String? rawValue = result.barcodes.first.rawValue;
+              if (rawValue == null) return;
+
+              showPopover(
+                bodyBuilder: (context) => PopMenu(),
+                onPop: () => print('Popover was popped!'),
+                direction: PopoverDirection.top,
+                backgroundColor: Colors.white,
+                width: 200,
+                height: 400,
+                arrowHeight: 15,
+                arrowWidth: 30,
+                context: context,
+              );
+              controller.dispose();
+              int k = int.parse(rawValue);
+              //String? token = await TokenService.getToken(); TODO for debug
+
+              // if (token == null || userRepo == null || k == userId) return;
+
+              print("calling the datavase");
+              // var data = await userRepo!.addFriend(token, k);TODO For debug
+
+              print("you are now friends with someone");
+              setState(() {
+                scan = true;
+              });
             },
           ),
         ),
@@ -193,12 +221,14 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
   }
 
   Future<void> _handleScan(String? rawValue) async {
     if (rawValue == null) return;
 
+    controller.dispose();
     int k = int.parse(rawValue);
     String? token = await TokenService.getToken();
 
@@ -211,5 +241,34 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
     setState(() {
       scan = true;
     });
+  }
+}
+
+class PopMenu extends StatelessWidget {
+  PopMenu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Icon(Icons.more_vert),
+      onTap: () async {
+        await showPopover(
+          context: context,
+          constraints: const BoxConstraints(maxHeight: 70),
+          transitionDuration: const Duration(milliseconds: 150),
+          width: 150,
+          direction: PopoverDirection.bottom,
+          bodyBuilder: (_) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              children: [
+                InkWell(child: Text("Today")),
+                InkWell(child: Text("Today")),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
