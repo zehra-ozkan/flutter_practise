@@ -49,4 +49,9 @@ class UserRepository {
   Future<void> uploadPost(String token, String path, String text) async {
     final a = service.addNewPost(token, path, text);
   }
+
+  Future<Map<String, dynamic>> addFriend(String token, int k) {
+    final a = service.addFriend(token, k);
+    return a;
+  }
 }

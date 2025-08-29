@@ -10,7 +10,9 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_popup/flutter_popup.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 String? sessionId; // Store this globally after login
 
@@ -27,6 +29,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   Widget containerChild = Icon(Icons.person_3_sharp);
   UserRepository? userRepo;
   int? userId;
+  bool? scan;
 
   late final TabController _tabController;
   TextEditingController textController = TextEditingController();
@@ -43,6 +46,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
 
     userRepo = Provider.of<UserRepository>(context, listen: false);
@@ -99,20 +103,39 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
     );
   }
 
-  Container _scanner() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 207, 221, 246), //I like this color
-        borderRadius: BorderRadius.circular(20),
-      ),
-      width: 250,
-      height: 250,
-      alignment: Alignment.center,
-      child: MobileScanner(
-        onDetect: (result) {
-          print(result.barcodes.first.rawValue);
-        },
-      ),
+  Column _scanner() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 207, 221, 246), //I like this color
+            borderRadius: BorderRadius.circular(20),
+          ),
+          width: 250,
+          height: 250,
+          alignment: Alignment.center,
+
+          child: MobileScanner(
+            onDetect: (result) {
+              print(result.barcodes.first.rawValue);
+              _handleScan(result.barcodes.first.rawValue);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            "Scan to add Friend",
+            style: TextStyle(
+              fontSize: 12,
+              color: const Color.fromARGB(255, 0, 0, 0),
+              fontWeight: FontWeight.w500, //I am
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -171,5 +194,22 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> _handleScan(String? rawValue) async {
+    if (rawValue == null) return;
+
+    int k = int.parse(rawValue);
+    String? token = await TokenService.getToken();
+
+    if (token == null || userRepo == null || k == userId) return;
+
+    print("calling the datavase");
+    var data = await userRepo?.addFriend(token, k);
+
+    print("you are now friends with someone");
+    setState(() {
+      scan = true;
+    });
   }
 }
