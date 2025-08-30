@@ -304,4 +304,26 @@ class ApiService {
       throw Exception('Failed to register: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getUserFriendPosts(String token) async {
+    _printCurrentOrigin();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/friend_posts'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      int count = responseBody["count"];
+
+      List<dynamic> bb = responseBody["posts"];
+      return {'count': count, 'posts': bb};
+    } else {
+      throw Exception('Failed to load user friends');
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:fitness/models/UserRepository.dart';
+import 'package:fitness/models/posts_model.dart';
 import 'package:fitness/models/recommendation_model.dart';
 import 'package:fitness/service/token_service.dart';
 import 'package:flutter/material.dart';
@@ -17,37 +18,43 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   UserRepository? userRepo;
-  List<Recommandation> recModels = [];
+  List<Post> postModels = [];
   String greetName = "";
 
   Widget containerChild = Icon(Icons.person_3_sharp);
 
-  void _getRecommendations() {
-    recModels = Recommandation.getRecommendations();
+  Future<void> _getFriendPosts() async {
+    if (userRepo == null) return;
+    String? token = await TokenService.getToken();
+    if (token == null) return;
+
+    var data = await userRepo!.getUserFriendPosts(token);
+    List<dynamic> bb = data["posts"];
+    setState(() {
+      postModels = bb.map((json) => Post.fromJson(json)).toList();
+    });
   }
 
   Future<void> _getUserProfile() async {
     if (userRepo == null) return;
+
     print("user repo is not null");
     String? token = await TokenService.getToken();
-    if (token != null) {
-      print("token is not null");
-      var data = await userRepo!.fetchHomeInfo(token!);
-      setState(() {
-        greetName = data["userName"];
-        Uint8List? str = data["picture"];
-        if (str != null) {
-          //TODO maybe is empty?
-          containerChild = Image.memory(str);
-        }
-      });
-    } else {
-      print("The token is null");
-    }
+    if (token == null) return;
+
+    print("token is not null");
+    var data = await userRepo!.fetchHomeInfo(token!);
+    setState(() {
+      greetName = data["userName"];
+      Uint8List? str = data["picture"];
+      if (str != null) {
+        containerChild = Image.memory(str);
+      }
+    });
   }
 
   void _setModels() {
-    _getRecommendations();
+    _getFriendPosts();
   }
 
   @override
@@ -64,7 +71,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _setModels();
+    // _setModels();
 
     return Scaffold(
       resizeToAvoidBottomInset:
@@ -147,12 +154,11 @@ class _HomePageState extends State<HomePage> {
 
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: recModels.length,
+            itemCount: postModels.length,
             separatorBuilder: (context, index) => SizedBox(width: 25),
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  color: recModels[index].boxColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -170,10 +176,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                      child: Image(
-                        image: AssetImage(recModels[index].iconPath),
-                        height: 80,
-                      ),
+                      child: Image.memory(postModels[index].postImage),
                     ),
                     Row(
                       children: [
@@ -181,18 +184,37 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(25),
-                              ),
-                              color: Colors.amber,
+                              shape: BoxShape.circle,
+                              color: const Color.fromARGB(255, 20, 78, 68),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(
+                                    255,
+                                    78,
+                                    78,
+                                    78,
+                                  ).withOpacity(0.5),
+                                  spreadRadius: 3,
+                                  blurRadius: 4,
+                                  offset: Offset(3, 3),
+                                ),
+                              ],
                             ),
-                            child: Icon(Icons.person_3_sharp),
+                            height: 50,
+                            child: Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: ClipOval(
+                                child: getProfile(
+                                  postModels[index].postUserImage,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         Column(
                           children: [
                             Text(
-                              recModels[index].name,
+                              postModels[index].postUserName,
                               style: TextStyle(
                                 fontSize: 14, //
                                 fontWeight: FontWeight.w600,
@@ -202,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(
                               width: 45,
                               child: Text(
-                                "${recModels[index].level}|${recModels[index].duration}|${recModels[index].cal}",
+                                postModels[index].text,
                                 style: TextStyle(
                                   fontSize: 12, //
                                   fontWeight: FontWeight.w400,
@@ -222,6 +244,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
+  }
+
+  Widget getProfile(Uint8List? postUserImage) {
+    return (postUserImage == null)
+        ? Icon(Icons.person_3_sharp)
+        : SizedBox(height: 50, child: Image.memory(postUserImage!));
   }
 
   Container _searchField() {
