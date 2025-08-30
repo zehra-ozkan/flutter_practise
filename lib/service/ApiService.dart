@@ -269,4 +269,39 @@ class ApiService {
       throw Exception('Failed to register: $e');
     }
   }
+
+  Future<Map<String, dynamic>> addFriendReq(String token, int k) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/app_users/friends/addReq'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'userId': k}), // Send as JSON object
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        String name = responseBody["name"];
+        String str = responseBody["profile"];
+        Uint8List? bytes;
+
+        if (str != "") {
+          bytes = base64Decode(str);
+        } else {
+          bytes = null;
+        }
+        return {'success': true, "profile": bytes, "name": name};
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'userId': -1};
+      } else {
+        throw Exception('HTTP Error: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Check server or network.');
+    } catch (e) {
+      throw Exception('Failed to register: $e');
+    }
+  }
 }

@@ -4,10 +4,9 @@ import 'package:fitness/pages/home.dart';
 import 'package:fitness/service/ApiService.dart';
 import 'package:fitness/models/UserRepository.dart';
 import 'package:fitness/service/token_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:popover/popover.dart';
-
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -15,8 +14,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_popup/flutter_popup.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-
-String? sessionId; // Store this globally after login
 
 class Qrpage extends StatefulWidget {
   //final DepartmentRepository depRepo; // Store as a field
@@ -31,7 +28,10 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   Widget containerChild = Icon(Icons.person_3_sharp);
   UserRepository? userRepo;
   int? userId;
+  int? reqId;
   bool? scan;
+  String? friendName = "someone";
+  Widget? profileChild = Icon(Icons.person_3_outlined, size: 250);
 
   late final TabController _tabController;
   TextEditingController textController = TextEditingController();
@@ -48,9 +48,9 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    scan = true;
+    reqId = -1;
     _tabController = TabController(length: 2, vsync: this);
-
     userRepo = Provider.of<UserRepository>(context, listen: false);
     _getUserProfile();
   }
@@ -78,8 +78,15 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
         controller: _tabController,
         children: <Widget>[
           Center(child: oldColumn()),
-          Center(child: _scanner(context)),
+          Center(child: scan! ? scanColumn() : friendProfileColumn()),
         ],
+      ),
+
+      bottomSheet: Container(
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 255, 0, 0), //I like this color
+        ),
+        height: 60,
       ),
     );
   }
@@ -105,7 +112,7 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
     );
   }
 
-  Column _scanner(BuildContext context) {
+  Column scanColumn() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,32 +129,14 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
           child: MobileScanner(
             onDetect: (result) async {
               print(result.barcodes.first.rawValue);
-              String? rawValue = result.barcodes.first.rawValue;
-              if (rawValue == null) return;
 
-              showPopover(
-                bodyBuilder: (context) => PopMenu(),
-                onPop: () => print('Popover was popped!'),
-                direction: PopoverDirection.top,
-                backgroundColor: Colors.white,
-                width: 200,
-                height: 400,
-                arrowHeight: 15,
-                arrowWidth: 30,
-                context: context,
-              );
-              controller.dispose();
-              int k = int.parse(rawValue);
-              //String? token = await TokenService.getToken(); TODO for debug
-
-              // if (token == null || userRepo == null || k == userId) return;
-
-              print("calling the datavase");
-              // var data = await userRepo!.addFriend(token, k);TODO For debug
+              await _handleScan(
+                result.barcodes.first.rawValue,
+              ); //todo I want to add a loading screen here
 
               print("you are now friends with someone");
               setState(() {
-                scan = true;
+                scan = false;
               });
             },
           ),
@@ -163,6 +152,61 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Column friendProfileColumn() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 207, 221, 246), //I like this color
+            borderRadius: BorderRadius.circular(20),
+          ),
+          width: 300,
+          height: 300,
+          alignment: Alignment.center,
+          child: profileChild,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0, right: 20),
+          child: Text(
+            "Add $friendName to Friends?",
+            style: TextStyle(
+              fontSize: 12,
+              color: const Color.fromARGB(255, 0, 0, 0),
+              fontWeight: FontWeight.w500, //I am
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  scan = true;
+                });
+              },
+              child: Icon(Icons.close),
+            ),
+            SizedBox(width: 15),
+            ElevatedButton(
+              onPressed: () {
+                _addFriend();
+                setState(() {
+                  scan = true; //I want to display a feedback here
+                });
+              },
+              child: Icon(Icons.check),
+            ),
+          ],
+        ),
+        SizedBox(height: 40),
       ],
     );
   }
@@ -230,45 +274,35 @@ class _QrpageState extends State<Qrpage> with TickerProviderStateMixin {
 
     controller.dispose();
     int k = int.parse(rawValue);
+    reqId = k;
     String? token = await TokenService.getToken();
 
     if (token == null || userRepo == null || k == userId) return;
 
-    print("calling the datavase");
-    var data = await userRepo!.addFriend(token, k);
+    print("calling the database");
+    var data = await userRepo!.addFriendReq(token, k);
+    //var data = await userRepo!.addFriend(token, k);
+
+    Uint8List? str = data["profile"];
+    String name = data["name"];
+    setState(() {
+      if (str != null) {
+        profileChild = Image.memory(str);
+        friendName = name;
+      }
+    });
 
     print("you are now friends with someone");
-    setState(() {
-      scan = true;
-    });
   }
-}
 
-class PopMenu extends StatelessWidget {
-  PopMenu({super.key});
+  Future<void> _addFriend() async {
+    if (reqId == null) return;
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Icon(Icons.more_vert),
-      onTap: () async {
-        await showPopover(
-          context: context,
-          constraints: const BoxConstraints(maxHeight: 70),
-          transitionDuration: const Duration(milliseconds: 150),
-          width: 150,
-          direction: PopoverDirection.bottom,
-          bodyBuilder: (_) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                InkWell(child: Text("Today")),
-                InkWell(child: Text("Today")),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    controller.dispose();
+    String? token = await TokenService.getToken();
+
+    if (token == null || userRepo == null || reqId == userId) return;
+    var data = await userRepo!.addFriend(token, reqId!);
+    reqId = -1;
   }
 }

@@ -54,4 +54,9 @@ class UserRepository {
     final a = service.addFriend(token, k);
     return a;
   }
+
+  Future<Map<String, dynamic>> addFriendReq(String token, int k) {
+    final a = service.addFriendReq(token, k);
+    return a;
+  }
 }
