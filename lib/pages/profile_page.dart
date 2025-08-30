@@ -84,8 +84,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _setModels() async {
-    await _getFriends();
-    await _getPosts();
+    _getFriends();
+    _getPosts();
     _getRecommendations();
   }
 
@@ -212,10 +212,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
           _friendsSection(),
           SizedBox(height: 30),
-          _recommendationsSection(),
+          _postSection(),
           SizedBox(height: 30),
 
-          Padding(
+          /* Padding(
             padding: const EdgeInsets.all(14.0),
             child: ElevatedButton(
               onPressed: () {
@@ -223,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: Text("See All Posts"),
             ),
-          ),
+          ), */
         ],
       ),
       bottomSheet: Container(
@@ -239,7 +239,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Container _profilePic() {
     //TODO fix the circle
     return Container(
-      // color: Colors.blue,
       child: SizedBox(
         //width: 80,
         height: 340,
@@ -251,7 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Column _recommendationsSection() {
+  Column _postSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -266,12 +265,61 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
-        SizedBox(height: 10),
+        SizedBox(height: 5),
         Container(
           height: 270,
-          padding: EdgeInsets.only(left: 20, right: 20),
+          padding: EdgeInsets.only(left: 10, right: 10),
 
-          child: ListView.separated(
+          child:
+              //itemCount: postModels.length,
+              //separatorBuilder: (context, index) => SizedBox(width: 25),
+              GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // 2 columns
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
+                ),
+                itemCount: postModels.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 3,
+                          blurRadius: 7,
+                          offset: Offset(8, 8),
+                        ),
+                      ],
+                    ),
+                    width: 80,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 1.0, right: 1.0),
+                          child: Image.memory(postModels[index].postImage),
+                        ),
+                        /*                          Column(
+                          children: [
+                            Text(
+                              postModels[index].text,
+                              style: TextStyle(
+                                fontSize: 14, //
+                                fontWeight: FontWeight.w500,
+                                //  color: const Color.fromARGB(255, 101, 101, 101),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(postModels[index].postDate.toString()), */
+                      ],
+                    ),
+                  );
+                },
+              ),
+          /* child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: postModels.length,
             separatorBuilder: (context, index) => SizedBox(width: 25),
@@ -299,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Column(
                       children: [
-                        Text(
+                        /* Text(
                           postModels[index].postUserName,
                           style: TextStyle(
                             fontSize: 14, //
@@ -307,12 +355,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         SizedBox(height: 5),
-
+ */
                         Text(
                           postModels[index].text,
                           style: TextStyle(
-                            fontSize: 12, //
-                            fontWeight: FontWeight.w400,
+                            fontSize: 14, //
+                            fontWeight: FontWeight.w500,
                             //  color: const Color.fromARGB(255, 101, 101, 101),
                           ),
                         ),
@@ -323,7 +371,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               );
             },
-          ),
+          ), */
         ),
       ],
     );
@@ -362,10 +410,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(width: 5), //this seperates the boxes from each other
             itemBuilder: (context, index) {
               return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-
                 width: 80,
 
                 child: Column(
@@ -375,13 +419,29 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: const Color.fromARGB(255, 20, 78, 68),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(
+                              255,
+                              78,
+                              78,
+                              78,
+                            ).withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 4,
+                            offset: Offset(3, 3),
+                          ),
+                        ],
                       ),
                       height: 60,
-                      child: ClipOval(
-                        // padding: const EdgeInsets.all(10.0),
-                        child: getProfile(friendModels[index].image),
-                        //child: ProfileWidget(str: friendModels[index].image),
+                      child: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: ClipOval(
+                          // padding: const EdgeInsets.all(10.0),
+                          child: getProfile(friendModels[index].image),
+                          //child: ProfileWidget(str: friendModels[index].image),
+                        ),
                       ),
                     ),
                     Text(
