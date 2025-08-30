@@ -52,6 +52,12 @@ class _NewPostState extends State<NewPost> {
           b(),
         ],
       ),
+      bottomSheet: Container(
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 255, 0, 0), //I like this color
+        ),
+        height: 60,
+      ),
     );
   }
 
@@ -65,24 +71,7 @@ class _NewPostState extends State<NewPost> {
         ),
       ),
       backgroundColor: Colors.black,
-      leading: GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, "/homepage");
-        },
-        child: Container(
-          margin: EdgeInsets.all(15),
-          alignment: Alignment.center,
-          /*           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 207, 221, 246), //I like this color
-            borderRadius: BorderRadius.circular(10),
-          ), */
-          child: Icon(
-            Icons.close,
-            size: 28,
-            color: Colors.white,
-          ), // I can also use flutter's icons
-        ),
-      ),
+      leading: _closeBtn(),
 
       actions: [
         GestureDetector(
@@ -120,6 +109,19 @@ class _NewPostState extends State<NewPost> {
           ),
         ),
       ],
+    );
+  }
+
+  GestureDetector _closeBtn() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, "/homepage");
+      },
+      child: Container(
+        margin: EdgeInsets.all(15),
+        alignment: Alignment.center,
+        child: Icon(Icons.close, size: 28, color: Colors.white),
+      ),
     );
   }
 
@@ -234,7 +236,7 @@ class _NewPostState extends State<NewPost> {
     });
   }
 
-  _uploadNewPost() async {
+  Future<void> _uploadNewPost() async {
     String? token = await TokenService.getToken();
     if (token == null) return; //TODO no image selected check
 

@@ -5,16 +5,11 @@ import 'package:fitness/models/friends_model.dart';
 import 'package:fitness/models/posts_model.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:fitness/models/User.dart';
 import 'package:fitness/models/UserRepository.dart';
-import 'package:fitness/models/category_models.dart';
 import 'package:fitness/models/recommendation_model.dart';
-import 'package:fitness/pages/intro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/service/token_service.dart';
 
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -49,7 +44,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (token == null) return;
     var data = await userRepo!.getUserFriends(token);
     List<dynamic> bb = data["friends"];
-    friendModels = bb.map((json) => Friend.fromJson(json)).toList();
+    setState(() {
+      friendModels = bb.map((json) => Friend.fromJson(json)).toList();
+    });
   }
 
   Future<void> _getPosts() async {
@@ -58,7 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (token == null) return;
     var data = await userRepo!.getUserPosts(token);
     List<dynamic> bb = data["posts"];
-    postModels = bb.map((json) => Post.fromJson(json)).toList();
+    setState(() {
+      postModels = bb.map((json) => Post.fromJson(json)).toList();
+    });
   }
 
   Future<void> _getUser() async {
@@ -84,9 +83,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _setModels() {
-    _getFriends();
-    _getPosts();
+  Future<void> _setModels() async {
+    await _getFriends();
+    await _getPosts();
     _getRecommendations();
   }
 
@@ -100,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    //_setModels();
+    // _setModels();
 
     return Scaffold(
       resizeToAvoidBottomInset:
@@ -295,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      padding: const EdgeInsets.only(left: 6.0, right: 6.0),
                       child: Image.memory(postModels[index].postImage),
                     ),
                     Column(
@@ -319,6 +318,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                     ),
+                    Text(postModels[index].postDate.toString()),
                   ],
                 ),
               );
