@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       bottomSheet: Container(
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 255, 0, 0), //I like this color
+          color: Color.fromARGB(255, 0, 0, 0), //I like this color
         ),
         height: 60,
       ),

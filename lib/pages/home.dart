@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomSheet: Container(
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 255, 0, 0), //I like this color
+          color: Color.fromARGB(255, 0, 0, 0), //I like this color
         ),
         height: 60,
       ),
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
-                            height: 50,
+                            height: 45,
                             child: Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: ClipOval(
@@ -318,6 +318,7 @@ class _HomePageState extends State<HomePage> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: const Color.fromARGB(0, 244, 67, 54),
+      toolbarHeight: 68,
       title: Text(
         "Hello $greetName",
         style: TextStyle(
@@ -327,7 +328,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ), //please do not mess up this part
       centerTitle: true,
-      elevation: 0.0, //this is the shadow
+      elevation: 1.3, //this is the shadow
 
       leading: GestureDetector(
         onTap: () {
@@ -340,7 +341,6 @@ class _HomePageState extends State<HomePage> {
             color: Color.fromARGB(255, 207, 221, 246), //I like this color
             borderRadius: BorderRadius.circular(10),
           ),
-          //child: SvgPicture.asset("assets/icons/back-svgrepo-com.svg"),
           child: Icon(
             Icons.arrow_back,
             size: 24,
@@ -354,18 +354,24 @@ class _HomePageState extends State<HomePage> {
             Navigator.pushNamed(context, "/profilepage");
           },
           child: Container(
-            //this is the bar on top
-            width: 37,
-            margin: EdgeInsets.all(10),
-            alignment: Alignment.center,
+            margin: EdgeInsets.only(right: 5),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 207, 221, 246), //I like this color
-              borderRadius: BorderRadius.circular(10),
+              shape: BoxShape.circle,
+              color: const Color.fromARGB(255, 20, 78, 68),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromARGB(255, 78, 78, 78).withOpacity(0.5),
+                  spreadRadius: 3,
+                  blurRadius: 4,
+                  offset: Offset(3, 3),
+                ),
+              ],
             ),
-            /* a */
-            child: ClipOval(
-              child: containerChild,
-            ), // I can also use flutter's icons
+            height: 50,
+            child: Padding(
+              padding: const EdgeInsets.all(1.0),
+              child: ClipOval(child: containerChild),
+            ),
           ),
         ),
       ],
