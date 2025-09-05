@@ -178,6 +178,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                       child: Image.memory(postModels[index].postImage),
                     ),
+
                     Row(
                       children: [
                         Padding(
@@ -211,6 +212,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
+                        SizedBox(width: 5),
                         Column(
                           children: [
                             Text(
@@ -222,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(height: 5),
                             SizedBox(
-                              width: 45,
+                              width: 95,
                               child: Text(
                                 postModels[index].text,
                                 style: TextStyle(

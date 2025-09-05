@@ -17,7 +17,7 @@ Future<void> main() async {
   final apiService = ApiService();
   final UserRepository ur = UserRepository(apiService);
 
-  /*  runApp(MyApp(departmentRepo: dr, userRepository: ur)); */
+  /*  runApp(MyApp(departmentRepo: dr, userRepository: ur));*/
   runApp(
     Provider(create: (context) => UserRepository(apiService), child: MyApp()),
   );

@@ -58,11 +58,11 @@ class _IntroPageState extends State<IntroPage> {
               password,
             );   */
             String? token = await widget.userRepo.validateLogin(
-              "doraemon",
+              "madara",
               "kitty",
             );
 
-            //String token = "1230"; //TODO only for debugging
+            //String token = "1230"; //TODO only for debuggin
 
             if (token != null) {
               // await FlutterSessionJwt.saveToken(token);
