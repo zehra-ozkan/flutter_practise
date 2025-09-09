@@ -53,14 +53,14 @@ class _IntroPageState extends State<IntroPage> {
             var password = passwordField.text;
             var userName = userNameField.text;
 
-            /*             String? token = await widget.userRepo.validateLogin(
+                        String? token = await widget.userRepo.validateLogin(
               userName,
               password,
-            );   */
-            String? token = await widget.userRepo.validateLogin(
+            );  
+/*             String? token = await widget.userRepo.validateLogin(
               "madara",
               "kitty",
-            );
+            ); */
 
             //String token = "1230"; //TODO only for debuggin
 
